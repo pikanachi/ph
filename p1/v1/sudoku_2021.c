@@ -149,13 +149,14 @@ sudoku9x9(CELDA cuadricula_C_C[NUM_FILAS][NUM_COLUMNAS],
     int correcto = 0;
 	  size_t i;
     /* calcula lista de candidatos, version C */
-    celdas_vacias[0] = candidatos_actualizar_c(cuadricula_C_C);
+		celdas_vacias[0] = candidatos_actualizar_c(cuadricula_C_C);
 
     //    /* Init C con propagar arm */
     celdas_vacias[1] = candidatos_actualizar_c_arm(cuadricula_C_ARM);
 
     //    /* Init arm con propagar arm */
-    //celdas_vacias[2] = candidatos_actualizar_arm(cuadricula_ARM_ARM);
+    
+		celdas_vacias[2] = candidatos_actualizar_arm(cuadricula_ARM_ARM);
 
     //    /* Init arm con propagar c */
     celdas_vacias[3] = candidatos_actualizar_arm_c(cuadricula_ARM_C);
