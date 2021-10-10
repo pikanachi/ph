@@ -1,0 +1,81 @@
+
+NIVEL DE COMPILACIÓN O0
+--------------------------------------------------------------------------------
+
+candidatos_actualizar_c 		= 0.00411117 - 0.00149342 	= 0,00261775
+
+candidatos_actualizar_c_arm 		= 0.00571142 - 0.00411117 	= 0,00160025
+
+candidatos_actualizar_arm_arm 		= 0.00700108 - 0.00571142 	= 0,00128966
+
+candidatos_actualizar_arm_c 		= 0.00940950 - 0.00700108 	= 0,00240842
+
+
+candidatos_actualizar_c 		= 57c - 4b4 = 0xc8		= 200 B = 50 instr (no ejec)
+
+candidatos_actualizar_c_arm 		= 648 - 580 = 0xc8		= 200 B = 50 instr (no ejec)
+
+candidatos_actualizar_arm		= 0x35c - 0x4ac = 0x150 	= 336 B = 84 instr (no ejec)
+
+candidatos_actualizar_c_arm 		= 29c - 200 = 9c 		= 156 B = 39 instr (no ejec)
+
+
+
+NIVEL DE COMPILACIÓN O1
+--------------------------------------------------------------------------------
+
+candidatos_actualizar_c 		= 0,00375017 - 0,00149250 	= 0,00225767
+
+candidatos_actualizar_c_arm 		= 0,00528783 - 0,00375017 	= 0,00153766
+
+candidatos_actualizar_arm_arm 		= 0,00657750 - 0,00528783 	= 0,00128967
+
+candidatos_actualizar_arm_c 		= 0,00868942 - 0,00657750 	= 0,00211192
+
+
+candidatos_actualizar_c 		= 584 - 4b4 = 0xd0 		= 208 B
+
+candidatos_actualizar_c_arm 		= 660 - 58c = 0xd4 		= 212 B
+
+candidatos_actualizar_arm		= 0x35c - 0x4ac = 0x150 	= 336 B
+
+candidatos_actualizar_c_arm 		= 29c - 200 = 9c 		= 156 B
+
+
+
+NIVEL DE COMPILACION O2
+--------------------------------------------------------------------------------
+
+candidatos_actualizar_c 		= 0,00374767 - 0,00149250 	= 0,00225517
+
+candidatos_actualizar_c_arm 		= 0,00521542 - 0,00374767 	= 0,00146775
+
+candidatos_actualizar_arm_arm 		= 0,00650508 - 0,00521542 	= 0,00128966
+
+candidatos_actualizar_arm_c 		= 0,00868450 - 0,00650508 	= 0,00217942
+
+
+
+NIVEL DE COMPILACIÓN O3 -time
+--------------------------------------------------------------------------------
+
+candidatos_actualizar_c 		= 0,00242383 - 0,00149233 	= 0,0009315
+
+candidatos_actualizar_c_arm 		= 0,00374625 - 0,00242383 	= 0,00132242
+
+candidatos_actualizar_arm_arm 		= 0,00503575 - 0,00374625  	= 0,00128950
+
+candidatos_actualizar_arm_c 		= 0,00633133 - 0,00503575 	= 0,00129558
+
+
+
+candidatos_actualizar_c 		=  660 - 4b4 = 1ac 		= 428 B
+
+candidatos_actualizar_c_arm 		= 71c - 67c = a0 		= 160 B
+
+candidatos_actualizar_arm		= 0x35c - 0x4ac = 0x150 	= 336 B
+
+candidatos_actualizar_arm_c 		= 29c - 200 = 9c 		= 156 B
+
+
+
