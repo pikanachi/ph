@@ -4,41 +4,44 @@
 /* *****************************************************************************
  * propaga el valor de una determinada celda en C
  * para actualizar las listas de candidatos
- * de las celdas en su su fila, columna y regi�n */
-/* Recibe como parametro la cuadricula, y la fila y columna de
+ * de las celdas en su su fila, columna y region
+ * Recibe como parametro la cuadricula, y la fila y columna de
  * la celda a propagar; no devuelve nada
  */
+
+
 void candidatos_propagar_c(CELDA cuadricula[NUM_FILAS][NUM_COLUMNAS],
 	uint8_t fila, uint8_t columna)
 {
     uint8_t j, i , init_i, init_j, end_i, end_j;
-    /* puede ayudar esta "look up table" a mejorar el rendimiento */
+    // puede ayudar esta "look up table" a mejorar el rendimiento
     const uint8_t init_region[NUM_FILAS] = {0, 0, 0, 3, 3, 3, 6, 6, 6};
 
-    /* valor que se propaga */
+    // valor que se propaga
     uint8_t valor = celda_leer_valor(cuadricula[fila][columna]);
 
-    /* recorrer fila descartando valor de listas candidatos */
+    // recorrer fila descartando valor de listas candidatos
     for (j=0;j<NUM_FILAS;j++)
-	celda_eliminar_candidato(&cuadricula[fila][j],valor);
+			celda_eliminar_candidato(&cuadricula[fila][j],valor);
 
-    /* recorrer columna descartando valor de listas candidatos */
+    // recorrer columna descartando valor de listas candidatos
     for (i=0;i<NUM_FILAS;i++)
-	celda_eliminar_candidato(&cuadricula[i][columna],valor);
+			celda_eliminar_candidato(&cuadricula[i][columna],valor);
 
-    /* determinar fronteras región */
+    // determinar fronteras región
     init_i = init_region[fila];
     init_j = init_region[columna];
     end_i = init_i + 3; //En verdad el fin es init_i + 3 -1 pero el for es < no <=
     end_j = init_j + 3;
 
-    /* recorrer region descartando valor de listas candidatos */
+    // recorrer region descartando valor de listas candidatos
     for (i=init_i; i<end_i; i++) {
       for(j=init_j; j<end_j; j++) {
 	      celda_eliminar_candidato(&cuadricula[i][j],valor);
 	    }
     }
 }
+
 
 /* *****************************************************************************
  * calcula todas las listas de candidatos (9x9)
@@ -70,6 +73,7 @@ static int candidatos_actualizar_c(CELDA cuadricula[NUM_FILAS][NUM_COLUMNAS])
 			if (esVacia(cuadricula[i][j])) {
 				celdas_vacias++;
 			} else {
+				//ORIGINAL candidatos_propagar_c(cuadricula, i, j);
 				candidatos_propagar_c(cuadricula, i, j);
 			}
 		}
@@ -86,7 +90,32 @@ static int candidatos_actualizar_c(CELDA cuadricula[NUM_FILAS][NUM_COLUMNAS])
 static int
 candidatos_actualizar_c_arm(CELDA cuadricula[NUM_FILAS][NUM_COLUMNAS])
 {
-	return -1; // por favor eliminar una vez completada la función
+	int celdas_vacias = 0;
+  uint8_t i;
+  uint8_t j;
+
+	//borrar todos los candidatos
+	for (i=0; i < NUM_FILAS; i++) {
+		for (j=0; j < NUM_FILAS; j++) {
+			if (esVacia(cuadricula[i][j])) {
+				elminaCandidatos(&cuadricula[i][j]);
+			}
+		}
+	}
+
+	//recalcular candidatos de las celdas vacias calculando cuantas hay vacias
+	for (i=0; i < NUM_FILAS; i++) {
+		for (j=0; j < NUM_FILAS; j++) {
+			if (esVacia(cuadricula[i][j])) {
+				celdas_vacias++;
+			} else {
+				candidatos_propagar_arm(cuadricula, i, j);
+			}
+		}
+	}
+
+	//retornar el numero de celdas vacias
+	return celdas_vacias;
 }
 
 static int
@@ -119,22 +148,23 @@ sudoku9x9(CELDA cuadricula_C_C[NUM_FILAS][NUM_COLUMNAS],
     int correcto = 0;
 	  size_t i;
     /* calcula lista de candidatos, version C */
-    celdas_vacias[0] = candidatos_actualizar_c(cuadricula_C_C);
+		celdas_vacias[0] = candidatos_actualizar_c(cuadricula_C_C);
 
     //    /* Init C con propagar arm */
     celdas_vacias[1] = candidatos_actualizar_c_arm(cuadricula_C_ARM);
 
     //    /* Init arm con propagar arm */
-    //celdas_vacias[2] = candidatos_actualizar_arm(cuadricula_ARM_ARM);
+    
+		celdas_vacias[2] = candidatos_actualizar_arm(cuadricula_ARM_ARM);
 
     //    /* Init arm con propagar c */
-    //celdas_vacias[3] = candidatos_actualizar_arm_c(cuadricula_ARM_C);
+    celdas_vacias[3] = candidatos_actualizar_arm_c(cuadricula_ARM_C);
 	
-	  //for (i=1; i < 4; ++i) {
-		//	if (celdas_vacias[i] != celdas_vacias[0]) {
-		//		return -1;
-		//	}
-		//}
+	  for (i=1; i < 4; ++i) {
+			if (celdas_vacias[i] != celdas_vacias[0]) {
+				return -1;
+			}
+		}
 
     /* verificar que la lista de candidatos C_C calculada es correcta */
     correcto = cuadricula_candidatos_verificar(cuadricula_C_C,solucion);

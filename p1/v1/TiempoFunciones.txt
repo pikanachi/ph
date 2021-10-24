@@ -1,0 +1,134 @@
+
+MAPA DE MEMORIA
+
+
+0x00000928
+0x00000860	sudoku9x9
+
+0x00000860
+0x00000824	main
+
+0x00000824
+0x00000800	esVacia
+
+0x00000800
+0x000007f0	elminaCandidatos
+
+0x000007f0
+0x00000768	cuadricula_candidatos_verificar
+
+0x00000768
+0x00000750	celda_eliminar_candidato
+
+0x00000750
+0x0000064c	candidatos_propagar_c
+
+0x0000064c
+0x00000580	candidatos_actualizar_c_arm
+
+0x00000580
+0x000004b4   	candidatos_actualizar_c
+
+
+
+
+CANDIDATOS_ACTUALIZAR_ARM_C -> ACTUALIZAR EN ARM ----> llama a candidatos propagar_c
+
+candidatos_actualizar_c_arm -> ACTUALIZAR EN C ----> LLAMA A PROPAGAR EN C
+
+
+NIVEL DE COMPILACIÓN O0
+--------------------------------------------------------------------------------
+
+candidatos_actualizar_c 		= 0.00411117 - 0.00149342 	= 0,00261775
+
+candidatos_actualizar_arm 		= 0.00700108 - 0.00571142 	= 0,00128966
+
+candidatos_actualizar_c_arm 		= 0.00571142 - 0.00411117 	= 0,00160025
+
+candidatos_actualizar_arm_c 		= 0.00940950 - 0.00700108 	= 0,00240842
+
+
+candidatos_actualizar_c 		= 57c - 4b4 = 0xc8		= 200 B = 50 instr (no ejec)
+
+candidatos_actualizar_arm		= 0x35c - 0x4ac = 0x150 	= 336 B = 84 instr (no ejec)
+
+candidatos_actualizar_c_arm 		= 648 - 580 = 0xc8		= 200 B = 50 instr (no ejec)
+
+candidatos_actualizar_arm_c 		= 29c - 200 = 9c 		= 156 B = 39 instr (no ejec)
+
+
+
+
+En este caso tenemos el mayor coste en tiempo de todos los niveles de compilación. Al tratarse de una traducción casi literal del código en C, no está activo el inlining, conservando todas las llamadas a las funciones de C del código original, como todas las llamadas a las funciones de celda.h, penalizando en tiempo y en número de instrucciones ejecutadas. Así se observa como en la versión "candidatos_actualizar_arm" que ha sido escrita sin esas llamadas a función o el uso de flags de condición en instrucciones se obtiene un tiempo de ejecución de 1,2 ms frente a 2,6 ms de la versión en C, osea un SpeedUp del 216,66&% de nuestra versión en ensamblador frente a la versión en C.
+
+Asimismo, entre las versiones "candidatos_actualizar_c_arm" y "candidatos_actualizar_arm_c" que sólo se diferencian en que una tiene en C la parte de "candidaros_propagar" y la parte de candidatos_actualizar en ensamblador y viceversa, se observa como de entre las dos funciones, "candidaros_propagar" es la que tiene mayor peso (en instrucciones y tiempo) por lo que es una función critica que si se optimiza se ganará sustancialmente en tiempo. En este caso el speedUp entre las versiones es de un 150% más rápida la versión de "candidaros_propagar" en ensamblador, en gran medida gracias al inlining que hace la versión en ensamblador que se ahorra todas las llamadas a funciones de celda.h.
+
+
+NIVEL DE COMPILACIÓN O1
+--------------------------------------------------------------------------------
+
+candidatos_actualizar_c 		= 0,00375017 - 0,00149250 	= 0,00225767
+
+candidatos_actualizar_arm_arm 		= 0,00657750 - 0,00528783 	= 0,00128967
+
+candidatos_actualizar_c_arm 		= 0,00528783 - 0,00375017 	= 0,00153766
+
+candidatos_actualizar_arm_c 		= 0,00868942 - 0,00657750 	= 0,00211192
+
+
+candidatos_actualizar_c 		= 584 - 4b4 = 0xd0 		= 208 B
+
+candidatos_actualizar_arm		= 0x35c - 0x4ac = 0x150 	= 336 B
+
+candidatos_actualizar_c_arm 		= 660 - 58c = 0xd4 		= 212 B
+
+candidatos_actualizar_arm_c 		= 29c - 200 = 9c 		= 156 B
+
+
+En este caso realiza un conjunto mínimo de optimizaciones en el código generado respecto al nivel
+-O0. Este nivel de compilación a diferencia de los demás (-O2 y -O3) trata de reducir el tamaño
+del código generado pero no reduce apenas el tiempo de ejecución. Se trata de un nivel de compilación 
+intermedio entre -O0 y -O2.
+
+En los resultados obtenidos se observa una pequeña reducción en tiempo con respecto a -O0, manteniendo el tamaño del código más o menos igual respecto al nivel -O0. En este caso la reducción en tiempo del código al código en C de "candidatos_actualizar_c" con respecto a la versión en ensamblador de "candidatos_actualizar_arm" es mínima y ofrece un speedUp de un 183,33% más rápida la versión en ensamblador.
+
+
+
+
+NIVEL DE COMPILACION O2
+--------------------------------------------------------------------------------
+
+candidatos_actualizar_c 		= 0,00374767 - 0,00149250 	= 0,00225517
+
+candidatos_actualizar_arm_arm 		= 0,00650508 - 0,00521542 	= 0,00128966
+
+candidatos_actualizar_c_arm 		= 0,00521542 - 0,00374767 	= 0,00146775
+
+candidatos_actualizar_arm_c 		= 0,00868450 - 0,00650508 	= 0,00217942
+
+
+
+NIVEL DE COMPILACIÓN O3 -time
+--------------------------------------------------------------------------------
+
+candidatos_actualizar_c 		= 0,00242383 - 0,00149233 	= 0,0009315
+
+candidatos_actualizar_arm_arm 		= 0,00503575 - 0,00374625  	= 0,00128950
+
+candidatos_actualizar_c_arm 		= 0,00374625 - 0,00242383 	= 0,00132242
+
+candidatos_actualizar_arm_c 		= 0,00633133 - 0,00503575 	= 0,00129558
+
+
+
+candidatos_actualizar_c 		=  660 - 4b4 = 1ac 		= 428 B
+
+candidatos_actualizar_arm		= 0x35c - 0x4ac = 0x150 	= 336 B
+
+candidatos_actualizar_c_arm 		= 71c - 67c = a0 		= 160 B
+
+candidatos_actualizar_arm_c 		= 29c - 200 = 9c 		= 156 B
+
+
+

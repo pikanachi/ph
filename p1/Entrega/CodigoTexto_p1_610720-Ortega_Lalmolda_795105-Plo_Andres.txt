@@ -1,0 +1,425 @@
+				AREA datos, DATA
+
+NUM_FILAS		EQU 9
+PADDING			EQU 7
+NUM_COLUMNAS		EQU NUM_FILAS + PADDING
+init_region		DCB 0, 0, 0, 3, 3, 3, 6, 6, 6
+
+	
+				PRESERVE8							;Para hacer llamadas a codigo c
+				AREA cod, CODE
+				EXPORT candidatos_actualizar_arm_c
+				EXPORT candidatos_propagar_arm
+				EXPORT	candidatos_actualizar_arm
+				EXTERN candidatos_propagar_c
+				ENTRY
+
+;CANDIDATOS_ACTUALIZAR_ARM_C
+;==============================================================================================================================================		
+; PARÁMTEROS:
+; r0 = @ini_cuadricula
+
+candidatos_actualizar_arm_c
+				PUSH {r4-r10,lr}					;regs a usar y lr
+				mov r9,#0						;r9 = celdas_vacias
+				mov r7,#NUM_FILAS					;r7 = i (AMBAS, numero de iteraciones del primer for y para direccionar la fila de la celda)
+				subs r7,r7,#1						;como el valor de NUM_FILAS es 9, le resto 1 para poder direccionar bien las celdas
+
+				mov r6,r0						;como la direccion de la celda necesita estar en r0 para pasarlo como parametro a esVacia y eliminaCandidatos
+		
+b11				mov r8,#NUM_FILAS					;r8 = j	(AMBAS, numero de iteraciones del segundo for y para direccionar la columna de la celda)
+				subs r8,r8,#1						;como el valor de NUM_FILAS es 9, le resto 1 para poder direccionar bien las celdas
+				
+b21				mov r0,r6						;recupero el valor de la primera celda para calcular la que toca
+
+				add r0,r0,r8,LSL#1
+				add r0,r0,r7,LSL#5					;calculo la direccion de la celda
+						
+				;esVacia
+				;---------------------------
+				ldrh r5,[r0]						;r5 = 31-16(DONT CARE) 15-0(INFORMACION DE LA CELDA)
+				ands r4,r5,#0x000F					;r4 = valor de la celda
+				;---------------------------
+
+				;elminaCandidatos si es vacia
+				;---------------------------
+				andeq r5,r5,#0x007F
+				strheq r5,[r0]
+				;---------------------------
+
+				subs r8,r8,#1						;una iteracion del segundo for
+				bpl b21							;acaba cuando j < 0 para calcular la columna 0
+		
+				subs r7,r7,#1						;una iteracion del primer for
+				bpl b11							;acaba cuando i < 0 para calcular la fila 0
+		
+				;SEGUNDO PAR DE BUCLES ANIDADOS
+				;---------------------------
+				mov r7,#NUM_FILAS					;r7 = i (AMBAS, numero de iteraciones del primer for y para direccionar la fila de la celda)
+				subs r7,r7,#1						;como el valor de NUM_FILAS es 9, le resto 1 para poder direccionar bien las celdas
+
+				mov r6,r0						;como la direccion de la celda necesita estar en r0 para pasarlo como parametro a esVacia y eliminaCandidatos
+
+b12				mov r8,#NUM_FILAS					;r8 = j	(AMBAS, numero de iteraciones del segundo for y para direccionar la columna de la celda)
+				subs r8,r8,#1						;como el valor de NUM_FILAS es 9, le resto 1 para poder direccionar bien las celdas
+
+b22				mov r0,r6							;recupero el valor de la primera celda para calcular la que toca
+
+				add r0,r0,r8,LSL#1
+				add r0,r0,r7,LSL#5					;calculo la direccion de la celda
+		
+				;esVacia
+				;---------------------------
+				ldrh r5,[r0]						;r5 = 31-16(DONT CARE) 15-0(INFORMACION DE LA CELDA)
+				ands r4,r5,#0x000F					;r4 = valor de la celda
+				;---------------------------			
+
+				addeq r9,r9,#1						;si estaba vacia sumo 1 a celdas vacias
+				movne r0,r6
+				movne r1,r7
+				movne r2,r8
+				
+				blne candidatos_propagar_c				;si la celda estaba vacia, propago sus candidatos(r0 = direcion celda, r1 = i, r8 = j)
+		
+				subs r8,r8,#1						;una iteracion del segundo for
+				bpl b22							;acaba cuando j < 0 para calcular la columna 0
+		
+				subs r7,r7,#1						;una iteracion del primer for
+				bpl b12							;acaba cuando i < 0 para calcular la fila 0
+
+				mov r0,r9						;se pasan las celdas vacías a r0 para devolverlas
+				POP {r4-r10,pc}						;restaurar los registros usados y vuelta del pc a sudoku_2021.c
+
+;==============================================================================================================================================
+
+
+
+
+
+;CANDIDATOS_PROPAGAR_ARM
+;==============================================================================================================================================		
+; PARÁMTEROS:
+; r0 = @ini_cuadricula
+; r1 = fila
+; r2 = columna
+							
+candidatos_propagar_arm	
+							
+				PUSH{r4-r12,lr}						; registros a usar
+							
+				;obtener la cuadricula[fila][columna]
+				;------------------------------------------------------------------------------------------------------------
+				add r6,r0,r1,LSL#5					;r6 = @ini_fila
+				add r5,r6,r2,LSL#1					;r5 = cuadricula[fila][columna]
+							
+				ldrh r12,[r5]						;r12 = cuadricula[fila][columna] = mem[@ini_fila + col*2] (r6+r5 = @cuadricula[fila][columna])				
+															
+				;valor = celda_leer_valor(cuadricula[fila][columna])
+				;celda_leer_valor
+				;---------------------------
+				and r12,#0x00F						;r12 = valor					
+				;---------------------------	
+										
+
+				mov r7,#NUM_FILAS					;r7 = j = 9		
+for1				;for(j=NUM_FILAS;j>0;j--)
+				;---------------------------
+				
+				;celda_eliminar_candidato(&cuadricula[r6],r12)
+				;celda_eliminar_candidato
+				;---------------------------
+				mov r11,#0x40						;0000 0000 0100 0000
+				mov r11,r11,LSL r12					;muevo el 1 tantas posiciones como valor y así obtengo la máscara para eliminar el candidato
+
+				ldrh r4,[r6]						;r4 = mem[r6]
+				orr r4,r4,r11						;r4 = or bit a bit para poner a 1 el bit de r4 que está a 1 en r11 y no tocar el resto
+				strh r4,[r6]						;mem[r6] = r4
+				;---------------------------
+
+				add r6,r6,#2						;avanza a la columna siguiente
+				subs r7,r7,#1						;r7 = j-- (concición de fin de bucle j = 0)
+				bne for1			
+				;---------------------------
+
+				mov r7,#NUM_FILAS					;r7 = i = 9
+				sub r5,r5,r1,LSL#5					;r5 = @ini_col
+								
+for2				;for(i=NUM_FILAS;i>0;i--)
+				;---------------------------			
+				;celda_eliminar_candidato(&cuadricula[r5],r12)
+		
+				;celda_eliminar_candidato
+				;---------------------------	
+				mov r11,#0x40						;0000 0000 0100 0000
+				mov r11,r11,LSL r12					;muevo el 1 tantas posiciones como valor y así obtengo la máscara para eliminar el candidato
+
+				ldrh r4,[r5]						;r4 = mem[r5]
+				orr r4,r4,r11						;r4 = or bit a bit para poner a 1 el bit de r4 que está a 1 en r11 y no tocar el resto
+				strh r4,[r5]						;mem[r5] = r4
+				;---------------------------
+
+				add r5,r5,#32						;r5 = cuadricula[fila + 1][columna] 
+				subs r7,r7,#1						;r7 = i-- (concición de fin de bucle i = 0)
+				bne for2
+				;---------------------------
+		
+							
+				;Encontrar el inicio de la región
+				;---------------------------
+				;init_i = init_region[fila];
+				;init_j = init_region[columna];
+				;end_i = init_i + 3;
+				;end_j = init_j + 3;
+							
+				LDR r6,=init_region
+							
+				add r7,r6,r1
+				add r8,r6,r2
+
+				ldrb r7,[r7] 						;r7  = init_i (fila)
+				ldrb r8,[r8] 						;r8  = init_j (col)
+				add r9,r7,#3						;r9  = end_i
+				add r10,r8,#3						;r10 = end_j
+
+for3				;for(i=init_i; i<end_i; i++)				;avanzar fila a fila
+				;---------------------------
+				mov r6,r8						;se restaura en r6 el valor de la columna para repetir for4
+
+				;Calcular la @cuadricula[init_i][init_j]
+				add	r5,r0,r7,LSL#5			
+				add	r5,r5,r8,LSL#1
+						
+
+for4				;for(j=init_j; j<end_j; j++)   			;avanzar columna a columna
+				;---------------------------
+
+				;celda_eliminar_candidato(&cuadricula[r6],r12)
+
+				;celda_eliminar_candidato
+				;---------------------------
+				mov r11,#0x40						;0000 0000 0100 0000
+				mov r11,r11,LSL r12					;muevo el 1 tantas posiciones como valor y así obtengo la máscara para eliminar el candidato
+
+				ldrh r4,[r5]						;r4 = mem[r5] = valor cuadricula
+				orr r4,r4,r11						;r4 = or bit a bit para poner a 1 el bit de r4 que está a 1 en r11 y no tocar el resto
+				strh r4,[r5]						;mem[r5] = r4
+				;---------------------------
+
+				add r5,r5,#2						;avanza r6 en la región
+				add r6,r6,#1						;avanza en la columna
+				cmp r6,r10						;se compara r6 (init_j que va avanzando por las columnas) con r10 end_j
+				bne for4
+				;---------------------------
+
+				add r7,r7,#1						;avanzar la fila en para for3
+				cmp r7,r9						;se compara r7 (init_i que va avanzando por las filas) con end_i
+				bne for3
+				;---------------------------
+
+				POP {r4-r12,pc}						;restaurar los registros usados y vuelta del pc a sudoku_2021.c
+		
+;==============================================================================================================================================	
+
+
+;CANDIDATOS_ACTUALIZAR_ARM_ARM
+;==============================================================================================================================================		
+; PARÁMTEROS:
+; r0 = @ini_cuadricula
+			
+candidatos_actualizar_arm			
+				PUSH{r4-r12,lr}
+				mov r9,#0						;r9 = celdas_vacias
+				mov r7,#NUM_FILAS					;r7 = i (AMBAS, numero de iteraciones del primer for y para direccionar la fila de la celda)
+				subs r7,r7,#1						;como el valor de NUM_FILAS es 9, le resto 1 para poder direccionar bien las celdas
+		
+				mov r6,r0						;como la direccion de la celda necesita estar en r0 para pasarlo como parametro a esVacia y eliminaCandidatos
+		
+arm_arm_b11		mov	r8,#NUM_FILAS						;r8 = j	(AMBAS, numero de iteraciones del segundo for y para direccionar la columna de la celda)
+				subs r8,r8,#1						;como el valor de NUM_FILAS es 9, le resto 1 para poder direccionar bien las celdas
+		
+arm_arm_b21		mov	r0,r6							;recupero el valor de la primera celda para calcular la que toca
+
+				add r0,r0,r8,LSL#1
+				add r0,r0,r7,LSL#5					;calculo la direccion de la celda
+						
+				;esVacia
+				;---------------------------
+				ldrh r5,[r0]						;r5 = 31-16(DONT CARE) 15-0(INFORMACION DE LA CELDA)
+				ands r4,r5,#0x000F					;r4 = valor de la celda
+				;---------------------------
+
+				;elminaCandidatos si es vacia
+				;---------------------------
+				andeq r5,r5,#0x007F
+				strheq r5,[r0]
+				;---------------------------
+
+				subs r8,r8,#1						;una iteracion del segundo for
+				bpl arm_arm_b21						;acaba cuando j < 0 para calcular la columna 0
+		
+				subs r7,r7,#1						;una iteracion del primer for
+				bpl arm_arm_b11						;acaba cuando i < 0 para calcular la fila 0
+		
+				;SEGUNDO PAR DE BUCLES ANIDADOS
+				;---------------------------
+				mov r7,#NUM_FILAS					;r7 = i (AMBAS, numero de iteraciones del primer for y para direccionar la fila de la celda)
+				subs r7,r7,#1						;como el valor de NUM_FILAS es 9, le resto 1 para poder direccionar bien las celdas
+		
+				mov r6,r0						;como la direccion de la celda necesita estar en r0 para pasarlo como parametro a esVacia y eliminaCandidatos
+		
+arm_arm_b12		mov	r8,#NUM_FILAS						;r8 = j	(AMBAS, numero de iteraciones del segundo for y para direccionar la columna de la celda)
+				subs r8,r8,#1						;como el valor de NUM_FILAS es 9, le resto 1 para poder direccionar bien las celdas
+		
+arm_arm_b22		mov	r0,r6							;recupero el valor de la primera celda para calcular la que toca
+
+				add r0,r0,r8,LSL#1
+				add r0,r0,r7,LSL#5					;calculo la direccion de la celda
+		
+				;esVacia
+				;---------------------------
+				ldrh r5,[r0]						;r5 = 31-16(DONT CARE) 15-0(INFORMACION DE LA CELDA)
+				ands r4,r5,#0x000F					;r0 = valor de la celda
+				;---------------------------			
+
+				addeq r9,r9,#1						;si estaba vacia sumo 1 a celdas vacias
+				movne r0,r6
+				beq noPropagar
+		
+				mov r1,r7
+				mov r2,r8
+				;r0 = cuadricula 
+				;r1 = fila
+				;r2 = columna
+				;r3 = celdas_vacias
+				;r6 = cuadricula backup
+				
+				push{r6-r9}
+				
+				;candidatos_propagar_arm
+				;==========================================================================================
+							
+				;obtener la cuadricula[fila][columna]
+				;---------------------------		
+				add	r6,r0,r1,LSL#5					;r6 = @ini_fila
+				add	r5,r6,r2,LSL#1					;r5 = cuadricula[fila][columna]
+
+				ldrh r12,[r5]						;r12 = cuadricula[fila][columna] = mem[@ini_fila + col*2] (r6+r5 = @cuadricula[fila][columna])
+															
+				;valor = celda_leer_valor(cuadricula[fila][columna])
+				;celda_leer_valor
+				;---------------------------
+				and r12,#0x00F						;r12 = valor					
+				;---------------------------						
+							
+
+				mov r7,#NUM_FILAS					; r7 = j = 9		
+arm_arm_for1			;for (j=NUM_FILAS;j>0;j--)
+				;---------------------------				
+
+				;celda_eliminar_candidato(&cuadricula[r6],r12)
+				;celda_eliminar_candidato
+				;---------------------------
+				mov r3,#0x40						;0000 0000 0100 0000
+				mov r3,r3,LSL r12					;muevo el 1 tantas posiciones como valor y así obtengo la máscara para eliminar el candidato
+							
+				ldrh r4,[r6]						;r4 = mem[r5]
+				orr r4,r4,r3						;r4 = or bit a bit para poner a 1 el bit de r4 que está a 1 en r3 y no tocar el resto
+				strh r4,[r6]						;mem[r5] = r4
+				;---------------------------
+
+				add r6,r6,#2						;avanza a la columna siguiente
+				subs r7,r7,#1						;r7 = j-- (concición de fin de bucle j = 0)
+				bne arm_arm_for1			
+				;---------------------------
+
+
+				mov r7,#NUM_FILAS					;r7 = i = 9
+				sub r5,r5,r1,LSL#5					;r5 = @ini_col
+							
+arm_arm_for2			;for (i=NUM_FILAS;i>0;i--)
+				;---------------------------
+				
+				;celda_eliminar_candidato(&cuadricula[r6],r12)
+				;celda_eliminar_candidato
+				;---------------------------
+				mov r3,#0x40						;0000 0000 0100 0000
+				mov r3,r3,LSL r12					;muevo el 1 tantas posiciones como valor y así obtengo la máscara para eliminar el candidato
+							
+				ldrh r4,[r5]						;r4 = mem[r5]
+				orr r4,r4,r3						;r4 = or bit a bit para poner a 1 el bit de r4 que está a 1 en r3 y no tocar el resto
+				strh r4,[r5]						;mem[r5] = r4
+				;---------------------------
+
+				add r5,r5,#32						;r5 = cuadricula[fila + 1][columna] 
+				subs r7,r7,#1						;r7 = i-- (concición de fin de bucle i = 0)
+				bne arm_arm_for2
+				;---------------------------
+				
+
+				;Encontrar el inicio de la región
+				;------------------------------------------------------------------------------------------------------------
+				;init_i = init_region[fila];
+				;init_j = init_region[columna];
+				;end_i = init_i + 3;
+				;end_j = init_j + 3;
+							
+				LDR r6,=init_region
+							
+				add r7,r6,r1
+				add r8,r6,r2
+
+				ldrb r7,[r7] 						;r7  = init_i (fila)
+				ldrb r8,[r8] 						;r8  = init_j (col)
+				add r9,r7,#3						;r9  = end_i
+				add r10,r8,#3						;r10 = end_j
+
+arm_arm_for3			;for (i=init_i; i<end_i; i++) 				;avanzar fila a fila
+				;---------------------------
+				mov r6,r8						;se restaura en r6 el valor de la columna para repetir for4
+
+				;calcular la @cuadricula[init_i][init_j]
+				add	r5,r0,r7,LSL#5			
+				add	r5,r5,r8,LSL#1
+							
+							
+
+arm_arm_for4			;for(j=init_j; j<end_j; j++)   			; avanzar columna a columna
+				;---------------------------
+				
+				;celda_eliminar_candidato(&cuadricula[r6],r12)
+				;celda_eliminar_candidato
+				;---------------------------
+				mov r11,#0x40						;0000 0000 0100 0000
+				mov r11,r11,LSL r12					;muevo el 1 tantas posiciones como valor y así obtengo la máscara para eliminar el candidato
+							
+				ldrh r4,[r5]						;r4 = mem[r5]
+				orr r4,r4,r11						;r4 = or bit a bit para poner a 1 el bit de r4 que está a 1 en r3 y no tocar el resto
+				strh r4,[r5]						;mem[r5] = r4
+				;---------------------------
+							
+				add r5,r5,#2						;avanza r6 en la región
+				add r6,r6,#1						;avanza en la columna
+				cmp r6,r10						;se compara r3 (init_j que va avanzando por las columnas) con end_j
+				bne arm_arm_for4
+				;---------------------------
+
+
+				add r7,r7,#1						;avanzar la fila en para for3
+				cmp r7,r9						;se compara r7 (init_i que va avanzando por las filas) con end_i
+				bne arm_arm_for3				
+				;---------------------------
+				
+				
+				pop{r6-r9}
+				;==========================================================================================
+
+noPropagar			subs r8,r8,#1						;una iteracion del segundo for
+				bpl arm_arm_b22						;acaba cuando j < 0 para calcular la columna 0
+		
+				subs r7,r7,#1						;una iteracion del primer for
+				bpl	arm_arm_b12					;acaba cuando i < 0 para calcular la fila 0
+
+				mov r0,r9						;se pasan las celdas vacías a r0 para devolverlas
+				POP {r4-r12,pc}		
+
+				END

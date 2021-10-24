@@ -1,0 +1,1101 @@
+
+
+
+ARM Macro Assembler    Page 1 
+
+
+    1 00000000                 AREA             datos, DATA
+    2 00000000         
+    3 00000000 00000009 
+                       NUM_FILAS
+                               EQU              9
+    4 00000000 00000007 
+                       PADDING EQU              7
+    5 00000000 00000010 
+                       NUM_COLUMNAS
+                               EQU              NUM_FILAS + PADDING
+    6 00000000 00 00 00 
+              03 03 03 
+              06 06 06 init_region
+                               DCB              0, 0, 0, 3, 3, 3, 6, 6, 6
+    7 00000009         
+    8 00000009         
+    9 00000009                 PRESERVE8                    ;Para hacer llamada
+                                                            s a codigo c
+   10 00000009                 AREA             cod, CODE
+   11 00000000                 EXPORT           candidatos_actualizar_arm_c
+   12 00000000                 EXPORT           candidatos_propagar_arm
+   13 00000000                 EXPORT           candidatos_actualizar_arm
+   14 00000000                 EXTERN           candidatos_propagar_c
+   15 00000000                 ENTRY
+   16 00000000         
+   17 00000000         ;CANDIDATOS_ACTUALIZAR_ARM_C
+   18 00000000         ;=======================================================
+                       ========================================================
+                       ===============================  
+   19 00000000         ; PARÁMTEROS:
+   20 00000000         ; r0 = @ini_cuadricula
+   21 00000000         
+   22 00000000         candidatos_actualizar_arm_c
+   23 00000000 E92D47F0        PUSH             {r4-r10,lr} ;regs a usar y lr
+   24 00000004 E3A09000        mov              r9,#0       ;r9 = celdas_vacias
+                                                            
+   25 00000008 E3A07009        mov              r7,#NUM_FILAS ;r7 = i (AMBAS, n
+                                                            umero de iteracione
+                                                            s del primer for y 
+                                                            para direccionar la
+                                                             fila de la celda)
+   26 0000000C E2577001        subs             r7,r7,#1    ;como el valor de N
+                                                            UM_FILAS es 9, le r
+                                                            esto 1 para poder d
+                                                            ireccionar bien las
+                                                             celdas
+   27 00000010         
+   28 00000010 E1A06000        mov              r6,r0       ;como la direccion 
+                                                            de la celda necesit
+                                                            a estar en r0 para 
+                                                            pasarlo como parame
+                                                            tro a esVacia y eli
+                                                            minaCandidatos
+   29 00000014         
+   30 00000014 E3A08009 
+                       b11     mov              r8,#NUM_FILAS ;r8 = j (AMBAS, n
+                                                            umero de iteracione
+                                                            s del segundo for y
+                                                             para direccionar l
+
+
+
+ARM Macro Assembler    Page 2 
+
+
+                                                            a columna de la cel
+                                                            da)
+   31 00000018 E2588001        subs             r8,r8,#1    ;como el valor de N
+                                                            UM_FILAS es 9, le r
+                                                            esto 1 para poder d
+                                                            ireccionar bien las
+                                                             celdas
+   32 0000001C         
+   33 0000001C E1A00006 
+                       b21     mov              r0,r6       ;recupero el valor 
+                                                            de la primera celda
+                                                             para calcular la q
+                                                            ue toca
+   34 00000020         
+   35 00000020 E0800088        add              r0,r0,r8,LSL#1
+   36 00000024 E0800287        add              r0,r0,r7,LSL#5 ;calculo la dire
+                                                            ccion de la celda
+   37 00000028         
+   38 00000028         ;esVacia
+   39 00000028         ;---------------------------
+   40 00000028 E1D050B0        ldrh             r5,[r0]     ;r5 = 31-16(DONT CA
+                                                            RE) 15-0(INFORMACIO
+                                                            N DE LA CELDA)
+   41 0000002C E215400F        ands             r4,r5,#0x000F ;r4 = valor de la
+                                                             celda
+   42 00000030         ;---------------------------
+   43 00000030         
+   44 00000030         ;elminaCandidatos si es vacia
+   45 00000030         ;---------------------------
+   46 00000030 0205507F        andeq            r5,r5,#0x007F
+   47 00000034 01C050B0        strheq           r5,[r0]
+   48 00000038         ;---------------------------
+   49 00000038         
+   50 00000038 E2588001        subs             r8,r8,#1    ;una iteracion del 
+                                                            segundo for
+   51 0000003C 5AFFFFF6        bpl              b21         ;acaba cuando j < 0
+                                                             para calcular la c
+                                                            olumna 0
+   52 00000040         
+   53 00000040 E2577001        subs             r7,r7,#1    ;una iteracion del 
+                                                            primer for
+   54 00000044 5AFFFFF2        bpl              b11         ;acaba cuando i < 0
+                                                             para calcular la f
+                                                            ila 0
+   55 00000048         
+   56 00000048         ;SEGUNDO PAR DE BUCLES ANIDADOS
+   57 00000048         ;---------------------------
+   58 00000048 E3A07009        mov              r7,#NUM_FILAS ;r7 = i (AMBAS, n
+                                                            umero de iteracione
+                                                            s del primer for y 
+                                                            para direccionar la
+                                                             fila de la celda)
+   59 0000004C E2577001        subs             r7,r7,#1    ;como el valor de N
+                                                            UM_FILAS es 9, le r
+                                                            esto 1 para poder d
+                                                            ireccionar bien las
+                                                             celdas
+   60 00000050         
+   61 00000050 E1A06000        mov              r6,r0       ;como la direccion 
+
+
+
+ARM Macro Assembler    Page 3 
+
+
+                                                            de la celda necesit
+                                                            a estar en r0 para 
+                                                            pasarlo como parame
+                                                            tro a esVacia y eli
+                                                            minaCandidatos
+   62 00000054         
+   63 00000054 E3A08009 
+                       b12     mov              r8,#NUM_FILAS ;r8 = j (AMBAS, n
+                                                            umero de iteracione
+                                                            s del segundo for y
+                                                             para direccionar l
+                                                            a columna de la cel
+                                                            da)
+   64 00000058 E2588001        subs             r8,r8,#1    ;como el valor de N
+                                                            UM_FILAS es 9, le r
+                                                            esto 1 para poder d
+                                                            ireccionar bien las
+                                                             celdas
+   65 0000005C         
+   66 0000005C E1A00006 
+                       b22     mov              r0,r6       ;recupero el valor 
+                                                            de la primera celda
+                                                             para calcular la q
+                                                            ue toca
+   67 00000060         
+   68 00000060 E0800088        add              r0,r0,r8,LSL#1
+   69 00000064 E0800287        add              r0,r0,r7,LSL#5 ;calculo la dire
+                                                            ccion de la celda
+   70 00000068         
+   71 00000068         ;esVacia
+   72 00000068         ;---------------------------
+   73 00000068 E1D050B0        ldrh             r5,[r0]     ;r5 = 31-16(DONT CA
+                                                            RE) 15-0(INFORMACIO
+                                                            N DE LA CELDA)
+   74 0000006C E215400F        ands             r4,r5,#0x000F ;r4 = valor de la
+                                                             celda
+   75 00000070         ;---------------------------   
+   76 00000070         
+   77 00000070 02899001        addeq            r9,r9,#1    ;si estaba vacia su
+                                                            mo 1 a celdas vacia
+                                                            s
+   78 00000074 11A00006        movne            r0,r6
+   79 00000078 11A01007        movne            r1,r7
+   80 0000007C 11A02008        movne            r2,r8
+   81 00000080         
+   82 00000080 1BFFFFFE        blne             candidatos_propagar_c ;si la ce
+                                                            lda estaba vacia, p
+                                                            ropago sus candidat
+                                                            os(r0 = direcion ce
+                                                            lda, r1 = i, r8 = j
+                                                            )
+   83 00000084         
+   84 00000084 E2588001        subs             r8,r8,#1    ;una iteracion del 
+                                                            segundo for
+   85 00000088 5AFFFFF3        bpl              b22         ;acaba cuando j < 0
+                                                             para calcular la c
+                                                            olumna 0
+   86 0000008C         
+   87 0000008C E2577001        subs             r7,r7,#1    ;una iteracion del 
+
+
+
+ARM Macro Assembler    Page 4 
+
+
+                                                            primer for
+   88 00000090 5AFFFFEF        bpl              b12         ;acaba cuando i < 0
+                                                             para calcular la f
+                                                            ila 0
+   89 00000094         
+   90 00000094 E1A00009        mov              r0,r9       ;se pasan las celda
+                                                            s vacías a r0 para 
+                                                            devolverlas
+   91 00000098 E8BD87F0        POP              {r4-r10,pc} ;restaurar los regi
+                                                            stros usados y vuel
+                                                            ta del pc a sudoku_
+                                                            2021.c
+   92 0000009C         
+   93 0000009C         ;=======================================================
+                       ========================================================
+                       ===============================
+   94 0000009C         
+   95 0000009C         
+   96 0000009C         
+   97 0000009C         
+   98 0000009C         
+   99 0000009C         ;CANDIDATOS_PROPAGAR_ARM
+  100 0000009C         ;=======================================================
+                       ========================================================
+                       ===============================  
+  101 0000009C         ; PARÁMTEROS:
+  102 0000009C         ; r0 = @ini_cuadricula
+  103 0000009C         ; r1 = fila
+  104 0000009C         ; r2 = columna
+  105 0000009C         
+  106 0000009C         candidatos_propagar_arm
+  107 0000009C         
+  108 0000009C E92D5FF0        PUSH{r4-r12,lr}              ; registros a usar
+  109 000000A0         
+  110 000000A0         ;obtener la cuadricula[fila][columna]
+  111 000000A0         ;-------------------------------------------------------
+                       -----------------------------------------------------
+  112 000000A0 E0806281        add              r6,r0,r1,LSL#5 ;r6 = @ini_fila
+  113 000000A4 E0865082        add              r5,r6,r2,LSL#1 ;r5 = cuadricula
+                                                            [fila][columna]
+  114 000000A8         
+  115 000000A8 E1D5C0B0        ldrh             r12,[r5]    ;r12 = cuadricula[f
+                                                            ila][columna] = mem
+                                                            [@ini_fila + col*2]
+                                                             (r6+r5 = @cuadricu
+                                                            la[fila][columna]) 
+                                                               
+  116 000000AC         
+  117 000000AC         ;valor = celda_leer_valor(cuadricula[fila][columna])
+  118 000000AC         ;celda_leer_valor
+  119 000000AC         ;---------------------------
+  120 000000AC E20CC00F        and              r12,#0x00F  ;r12 = valor     
+  121 000000B0         ;--------------------------- 
+  122 000000B0         
+  123 000000B0         
+  124 000000B0 E3A07009        mov              r7,#NUM_FILAS ;r7 = j = 9  
+  125 000000B4         for1                                 ;for(j=NUM_FILAS;j>
+                                                            0;j--)
+  126 000000B4         ;---------------------------
+
+
+
+ARM Macro Assembler    Page 5 
+
+
+  127 000000B4         
+  128 000000B4         ;celda_eliminar_candidato(&cuadricula[r6],r12)
+  129 000000B4         ;celda_eliminar_candidato
+  130 000000B4         ;---------------------------
+  131 000000B4 E3A0B040        mov              r11,#0x40   ;0000 0000 0100 000
+                                                            0
+  132 000000B8 E1A0BC1B        mov              r11,r11,LSL r12 ;muevo el 1 tan
+                                                            tas posiciones como
+                                                             valor y así obteng
+                                                            o la máscara para e
+                                                            liminar el candidat
+                                                            o
+  133 000000BC         
+  134 000000BC E1D640B0        ldrh             r4,[r6]     ;r4 = mem[r6]
+  135 000000C0 E184400B        orr              r4,r4,r11   ;r4 = or bit a bit 
+                                                            para poner a 1 el b
+                                                            it de r4 que está a
+                                                             1 en r11 y no toca
+                                                            r el resto
+  136 000000C4 E1C640B0        strh             r4,[r6]     ;mem[r6] = r4
+  137 000000C8         ;---------------------------
+  138 000000C8         
+  139 000000C8 E2866002        add              r6,r6,#2    ;avanza a la column
+                                                            a siguiente
+  140 000000CC E2577001        subs             r7,r7,#1    ;r7 = j-- (concició
+                                                            n de fin de bucle j
+                                                             = 0)
+  141 000000D0 1AFFFFF7        bne              for1
+  142 000000D4         ;---------------------------
+  143 000000D4         
+  144 000000D4 E3A07009        mov              r7,#NUM_FILAS ;r7 = i = 9
+  145 000000D8 E0455281        sub              r5,r5,r1,LSL#5 ;r5 = @ini_col  
+                                                                    
+  146 000000DC         for2                                 ;for(i=NUM_FILAS;i>
+                                                            0;i--)
+  147 000000DC         ;---------------------------   
+  148 000000DC         ;celda_eliminar_candidato(&cuadricula[r5],r12)
+  149 000000DC         
+  150 000000DC         ;celda_eliminar_candidato
+  151 000000DC         ;--------------------------- 
+  152 000000DC E3A0B040        mov              r11,#0x40   ;0000 0000 0100 000
+                                                            0
+  153 000000E0 E1A0BC1B        mov              r11,r11,LSL r12 ;muevo el 1 tan
+                                                            tas posiciones como
+                                                             valor y así obteng
+                                                            o la máscara para e
+                                                            liminar el candidat
+                                                            o
+  154 000000E4         
+  155 000000E4 E1D540B0        ldrh             r4,[r5]     ;r4 = mem[r5]
+  156 000000E8 E184400B        orr              r4,r4,r11   ;r4 = or bit a bit 
+                                                            para poner a 1 el b
+                                                            it de r4 que está a
+                                                             1 en r11 y no toca
+                                                            r el resto
+  157 000000EC E1C540B0        strh             r4,[r5]     ;mem[r5] = r4
+  158 000000F0         ;---------------------------
+  159 000000F0         
+  160 000000F0 E2855020        add              r5,r5,#32   ;r5 = cuadricula[fi
+
+
+
+ARM Macro Assembler    Page 6 
+
+
+                                                            la + 1][columna] 
+  161 000000F4 E2577001        subs             r7,r7,#1    ;r7 = i-- (concició
+                                                            n de fin de bucle i
+                                                             = 0)
+  162 000000F8 1AFFFFF7        bne              for2
+  163 000000FC         ;---------------------------
+  164 000000FC         
+  165 000000FC         
+  166 000000FC         ;Encontrar el inicio de la región
+  167 000000FC         ;---------------------------
+  168 000000FC         ;init_i = init_region[fila];
+  169 000000FC         ;init_j = init_region[columna];
+  170 000000FC         ;end_i = init_i + 3;
+  171 000000FC         ;end_j = init_j + 3;
+  172 000000FC         
+  173 000000FC E59F61AC        LDR              r6,=init_region
+  174 00000100         
+  175 00000100 E0867001        add              r7,r6,r1
+  176 00000104 E0868002        add              r8,r6,r2
+  177 00000108         
+  178 00000108 E5D77000        ldrb             r7,[r7]     ;r7  = init_i (fila
+                                                            )
+  179 0000010C E5D88000        ldrb             r8,[r8]     ;r8  = init_j (col)
+                                                            
+  180 00000110 E2879003        add              r9,r7,#3    ;r9  = end_i
+  181 00000114 E288A003        add              r10,r8,#3   ;r10 = end_j
+  182 00000118         
+  183 00000118         for3                                 ;for(i=init_i; i<en
+                                                            d_i; i++)  ;avanzar
+                                                             fila a fila
+  184 00000118         ;---------------------------
+  185 00000118 E1A06008        mov              r6,r8       ;se restaura en r6 
+                                                            el valor de la colu
+                                                            mna para repetir fo
+                                                            r4
+  186 0000011C         
+  187 0000011C         ;Calcular la @cuadricula[init_i][init_j]
+  188 0000011C E0805287        add              r5,r0,r7,LSL#5
+  189 00000120 E0855088        add              r5,r5,r8,LSL#1
+  190 00000124         
+  191 00000124         
+  192 00000124         for4                                 ;for(j=init_j; j<en
+                                                            d_j; j++)     ;avan
+                                                            zar columna a colum
+                                                            na
+  193 00000124         ;---------------------------
+  194 00000124         
+  195 00000124         ;celda_eliminar_candidato(&cuadricula[r6],r12)
+  196 00000124         
+  197 00000124         ;celda_eliminar_candidato
+  198 00000124         ;---------------------------
+  199 00000124 E3A0B040        mov              r11,#0x40   ;0000 0000 0100 000
+                                                            0
+  200 00000128 E1A0BC1B        mov              r11,r11,LSL r12 ;muevo el 1 tan
+                                                            tas posiciones como
+                                                             valor y así obteng
+                                                            o la máscara para e
+                                                            liminar el candidat
+                                                            o
+
+
+
+ARM Macro Assembler    Page 7 
+
+
+  201 0000012C         
+  202 0000012C E1D540B0        ldrh             r4,[r5]     ;r4 = mem[r5] = val
+                                                            or cuadricula
+  203 00000130 E184400B        orr              r4,r4,r11   ;r4 = or bit a bit 
+                                                            para poner a 1 el b
+                                                            it de r4 que está a
+                                                             1 en r11 y no toca
+                                                            r el resto
+  204 00000134 E1C540B0        strh             r4,[r5]     ;mem[r5] = r4
+  205 00000138         ;---------------------------
+  206 00000138         
+  207 00000138 E2855002        add              r5,r5,#2    ;avanza r6 en la re
+                                                            gión
+  208 0000013C E2866001        add              r6,r6,#1    ;avanza en la colum
+                                                            na
+  209 00000140 E156000A        cmp              r6,r10      ;se compara r6 (ini
+                                                            t_j que va avanzand
+                                                            o por las columnas)
+                                                             con r10 end_j
+  210 00000144 1AFFFFF6        bne              for4
+  211 00000148         ;---------------------------
+  212 00000148         
+  213 00000148 E2877001        add              r7,r7,#1    ;avanzar la fila en
+                                                             para for3
+  214 0000014C E1570009        cmp              r7,r9       ;se compara r7 (ini
+                                                            t_i que va avanzand
+                                                            o por las filas) co
+                                                            n end_i
+  215 00000150 1AFFFFF0        bne              for3
+  216 00000154         ;---------------------------
+  217 00000154         
+  218 00000154 E8BD9FF0        POP              {r4-r12,pc} ;restaurar los regi
+                                                            stros usados y vuel
+                                                            ta del pc a sudoku_
+                                                            2021.c
+  219 00000158         
+  220 00000158         ;=======================================================
+                       ========================================================
+                       =============================== 
+  221 00000158         
+  222 00000158         
+  223 00000158         ;CANDIDATOS_ACTUALIZAR_ARM_ARM
+  224 00000158         ;=======================================================
+                       ========================================================
+                       ===============================  
+  225 00000158         ; PARÁMTEROS:
+  226 00000158         ; r0 = @ini_cuadricula
+  227 00000158         
+  228 00000158         candidatos_actualizar_arm
+  229 00000158 E92D5FF0        PUSH{r4-r12,lr}
+  230 0000015C E3A09000        mov              r9,#0       ;r9 = celdas_vacias
+                                                            
+  231 00000160 E3A07009        mov              r7,#NUM_FILAS ;r7 = i (AMBAS, n
+                                                            umero de iteracione
+                                                            s del primer for y 
+                                                            para direccionar la
+                                                             fila de la celda)
+  232 00000164 E2577001        subs             r7,r7,#1    ;como el valor de N
+                                                            UM_FILAS es 9, le r
+
+
+
+ARM Macro Assembler    Page 8 
+
+
+                                                            esto 1 para poder d
+                                                            ireccionar bien las
+                                                             celdas
+  233 00000168         
+  234 00000168 E1A06000        mov              r6,r0       ;como la direccion 
+                                                            de la celda necesit
+                                                            a estar en r0 para 
+                                                            pasarlo como parame
+                                                            tro a esVacia y eli
+                                                            minaCandidatos
+  235 0000016C         
+  236 0000016C E3A08009 
+                       arm_arm_b11
+                               mov              r8,#NUM_FILAS ;r8 = j (AMBAS, n
+                                                            umero de iteracione
+                                                            s del segundo for y
+                                                             para direccionar l
+                                                            a columna de la cel
+                                                            da)
+  237 00000170 E2588001        subs             r8,r8,#1    ;como el valor de N
+                                                            UM_FILAS es 9, le r
+                                                            esto 1 para poder d
+                                                            ireccionar bien las
+                                                             celdas
+  238 00000174         
+  239 00000174 E1A00006 
+                       arm_arm_b21
+                               mov              r0,r6       ;recupero el valor 
+                                                            de la primera celda
+                                                             para calcular la q
+                                                            ue toca
+  240 00000178         
+  241 00000178 E0800088        add              r0,r0,r8,LSL#1
+  242 0000017C E0800287        add              r0,r0,r7,LSL#5 ;calculo la dire
+                                                            ccion de la celda
+  243 00000180         
+  244 00000180         ;esVacia
+  245 00000180         ;---------------------------
+  246 00000180 E1D050B0        ldrh             r5,[r0]     ;r5 = 31-16(DONT CA
+                                                            RE) 15-0(INFORMACIO
+                                                            N DE LA CELDA)
+  247 00000184 E215400F        ands             r4,r5,#0x000F ;r4 = valor de la
+                                                             celda
+  248 00000188         ;---------------------------
+  249 00000188         
+  250 00000188         ;elminaCandidatos si es vacia
+  251 00000188         ;---------------------------
+  252 00000188 0205507F        andeq            r5,r5,#0x007F
+  253 0000018C 01C050B0        strheq           r5,[r0]
+  254 00000190         ;---------------------------
+  255 00000190         
+  256 00000190 E2588001        subs             r8,r8,#1    ;una iteracion del 
+                                                            segundo for
+  257 00000194 5AFFFFF6        bpl              arm_arm_b21 ;acaba cuando j < 0
+                                                             para calcular la c
+                                                            olumna 0
+  258 00000198         
+  259 00000198 E2577001        subs             r7,r7,#1    ;una iteracion del 
+                                                            primer for
+
+
+
+ARM Macro Assembler    Page 9 
+
+
+  260 0000019C 5AFFFFF2        bpl              arm_arm_b11 ;acaba cuando i < 0
+                                                             para calcular la f
+                                                            ila 0
+  261 000001A0         
+  262 000001A0         ;SEGUNDO PAR DE BUCLES ANIDADOS
+  263 000001A0         ;---------------------------
+  264 000001A0 E3A07009        mov              r7,#NUM_FILAS ;r7 = i (AMBAS, n
+                                                            umero de iteracione
+                                                            s del primer for y 
+                                                            para direccionar la
+                                                             fila de la celda)
+  265 000001A4 E2577001        subs             r7,r7,#1    ;como el valor de N
+                                                            UM_FILAS es 9, le r
+                                                            esto 1 para poder d
+                                                            ireccionar bien las
+                                                             celdas
+  266 000001A8         
+  267 000001A8 E1A06000        mov              r6,r0       ;como la direccion 
+                                                            de la celda necesit
+                                                            a estar en r0 para 
+                                                            pasarlo como parame
+                                                            tro a esVacia y eli
+                                                            minaCandidatos
+  268 000001AC         
+  269 000001AC E3A08009 
+                       arm_arm_b12
+                               mov              r8,#NUM_FILAS ;r8 = j (AMBAS, n
+                                                            umero de iteracione
+                                                            s del segundo for y
+                                                             para direccionar l
+                                                            a columna de la cel
+                                                            da)
+  270 000001B0 E2588001        subs             r8,r8,#1    ;como el valor de N
+                                                            UM_FILAS es 9, le r
+                                                            esto 1 para poder d
+                                                            ireccionar bien las
+                                                             celdas
+  271 000001B4         
+  272 000001B4 E1A00006 
+                       arm_arm_b22
+                               mov              r0,r6       ;recupero el valor 
+                                                            de la primera celda
+                                                             para calcular la q
+                                                            ue toca
+  273 000001B8         
+  274 000001B8 E0800088        add              r0,r0,r8,LSL#1
+  275 000001BC E0800287        add              r0,r0,r7,LSL#5 ;calculo la dire
+                                                            ccion de la celda
+  276 000001C0         
+  277 000001C0         ;esVacia
+  278 000001C0         ;---------------------------
+  279 000001C0 E1D050B0        ldrh             r5,[r0]     ;r5 = 31-16(DONT CA
+                                                            RE) 15-0(INFORMACIO
+                                                            N DE LA CELDA)
+  280 000001C4 E215400F        ands             r4,r5,#0x000F ;r0 = valor de la
+                                                             celda
+  281 000001C8         ;---------------------------   
+  282 000001C8         
+  283 000001C8 02899001        addeq            r9,r9,#1    ;si estaba vacia su
+
+
+
+ARM Macro Assembler    Page 10 
+
+
+                                                            mo 1 a celdas vacia
+                                                            s
+  284 000001CC 11A00006        movne            r0,r6
+  285 000001D0 0A000030        beq              noPropagar
+  286 000001D4         
+  287 000001D4 E1A01007        mov              r1,r7
+  288 000001D8 E1A02008        mov              r2,r8
+  289 000001DC         ;r0 = cuadricula 
+  290 000001DC         ;r1 = fila
+  291 000001DC         ;r2 = columna
+  292 000001DC         ;r3 = celdas_vacias
+  293 000001DC         ;r6 = cuadricula backup
+  294 000001DC         
+  295 000001DC E92D03C0        push{r6-r9}
+  296 000001E0         
+  297 000001E0         ;candidatos_propagar_arm
+  298 000001E0         ;=======================================================
+                       ===================================
+  299 000001E0         
+  300 000001E0         ;obtener la cuadricula[fila][columna]
+  301 000001E0         ;---------------------------  
+  302 000001E0 E0806281        add              r6,r0,r1,LSL#5 ;r6 = @ini_fila
+  303 000001E4 E0865082        add              r5,r6,r2,LSL#1 ;r5 = cuadricula
+                                                            [fila][columna]
+  304 000001E8         
+  305 000001E8 E1D5C0B0        ldrh             r12,[r5]    ;r12 = cuadricula[f
+                                                            ila][columna] = mem
+                                                            [@ini_fila + col*2]
+                                                             (r6+r5 = @cuadricu
+                                                            la[fila][columna])
+  306 000001EC         
+  307 000001EC         ;valor = celda_leer_valor(cuadricula[fila][columna])
+  308 000001EC         ;celda_leer_valor
+  309 000001EC         ;---------------------------
+  310 000001EC E20CC00F        and              r12,#0x00F  ;r12 = valor     
+  311 000001F0         ;---------------------------      
+  312 000001F0         
+  313 000001F0         
+  314 000001F0 E3A07009        mov              r7,#NUM_FILAS ; r7 = j = 9  
+  315 000001F4         arm_arm_for1                         ;for (j=NUM_FILAS;j
+                                                            >0;j--)
+  316 000001F4         ;---------------------------    
+  317 000001F4         
+  318 000001F4         ;celda_eliminar_candidato(&cuadricula[r6],r12)
+  319 000001F4         ;celda_eliminar_candidato
+  320 000001F4         ;---------------------------
+  321 000001F4 E3A03040        mov              r3,#0x40    ;0000 0000 0100 000
+                                                            0
+  322 000001F8 E1A03C13        mov              r3,r3,LSL r12 ;muevo el 1 tanta
+                                                            s posiciones como v
+                                                            alor y así obtengo 
+                                                            la máscara para eli
+                                                            minar el candidato
+  323 000001FC         
+  324 000001FC E1D640B0        ldrh             r4,[r6]     ;r4 = mem[r5]
+  325 00000200 E1844003        orr              r4,r4,r3    ;r4 = or bit a bit 
+                                                            para poner a 1 el b
+                                                            it de r4 que está a
+                                                             1 en r3 y no tocar
+
+
+
+ARM Macro Assembler    Page 11 
+
+
+                                                             el resto
+  326 00000204 E1C640B0        strh             r4,[r6]     ;mem[r5] = r4
+  327 00000208         ;---------------------------
+  328 00000208         
+  329 00000208 E2866002        add              r6,r6,#2    ;avanza a la column
+                                                            a siguiente
+  330 0000020C E2577001        subs             r7,r7,#1    ;r7 = j-- (concició
+                                                            n de fin de bucle j
+                                                             = 0)
+  331 00000210 1AFFFFF7        bne              arm_arm_for1
+  332 00000214         ;---------------------------
+  333 00000214         
+  334 00000214         
+  335 00000214 E3A07009        mov              r7,#NUM_FILAS ;r7 = i = 9
+  336 00000218 E0455281        sub              r5,r5,r1,LSL#5 ;r5 = @ini_col
+  337 0000021C         
+  338 0000021C         arm_arm_for2                         ;for (i=NUM_FILAS;i
+                                                            >0;i--)
+  339 0000021C         ;---------------------------
+  340 0000021C         
+  341 0000021C         ;celda_eliminar_candidato(&cuadricula[r6],r12)
+  342 0000021C         ;celda_eliminar_candidato
+  343 0000021C         ;---------------------------
+  344 0000021C E3A03040        mov              r3,#0x40    ;0000 0000 0100 000
+                                                            0
+  345 00000220 E1A03C13        mov              r3,r3,LSL r12 ;muevo el 1 tanta
+                                                            s posiciones como v
+                                                            alor y así obtengo 
+                                                            la máscara para eli
+                                                            minar el candidato
+  346 00000224         
+  347 00000224 E1D540B0        ldrh             r4,[r5]     ;r4 = mem[r5]
+  348 00000228 E1844003        orr              r4,r4,r3    ;r4 = or bit a bit 
+                                                            para poner a 1 el b
+                                                            it de r4 que está a
+                                                             1 en r3 y no tocar
+                                                             el resto
+  349 0000022C E1C540B0        strh             r4,[r5]     ;mem[r5] = r4
+  350 00000230         ;---------------------------
+  351 00000230         
+  352 00000230 E2855020        add              r5,r5,#32   ;r5 = cuadricula[fi
+                                                            la + 1][columna] 
+  353 00000234 E2577001        subs             r7,r7,#1    ;r7 = i-- (concició
+                                                            n de fin de bucle i
+                                                             = 0)
+  354 00000238 1AFFFFF7        bne              arm_arm_for2
+  355 0000023C         ;---------------------------
+  356 0000023C         
+  357 0000023C         
+  358 0000023C         ;Encontrar el inicio de la región
+  359 0000023C         ;-------------------------------------------------------
+                       -----------------------------------------------------
+  360 0000023C         ;init_i = init_region[fila];
+  361 0000023C         ;init_j = init_region[columna];
+  362 0000023C         ;end_i = init_i + 3;
+  363 0000023C         ;end_j = init_j + 3;
+  364 0000023C         
+  365 0000023C E59F606C        LDR              r6,=init_region
+  366 00000240         
+
+
+
+ARM Macro Assembler    Page 12 
+
+
+  367 00000240 E0867001        add              r7,r6,r1
+  368 00000244 E0868002        add              r8,r6,r2
+  369 00000248         
+  370 00000248 E5D77000        ldrb             r7,[r7]     ;r7  = init_i (fila
+                                                            )
+  371 0000024C E5D88000        ldrb             r8,[r8]     ;r8  = init_j (col)
+                                                            
+  372 00000250 E2879003        add              r9,r7,#3    ;r9  = end_i
+  373 00000254 E288A003        add              r10,r8,#3   ;r10 = end_j
+  374 00000258         
+  375 00000258         arm_arm_for3                         ;for (i=init_i; i<e
+                                                            nd_i; i++)   ;avanz
+                                                            ar fila a fila
+  376 00000258         ;---------------------------
+  377 00000258 E1A06008        mov              r6,r8       ;se restaura en r6 
+                                                            el valor de la colu
+                                                            mna para repetir fo
+                                                            r4
+  378 0000025C         
+  379 0000025C         ;calcular la @cuadricula[init_i][init_j]
+  380 0000025C E0805287        add              r5,r0,r7,LSL#5
+  381 00000260 E0855088        add              r5,r5,r8,LSL#1
+  382 00000264         
+  383 00000264         
+  384 00000264         
+  385 00000264         arm_arm_for4                         ;for(j=init_j; j<en
+                                                            d_j; j++)     ; ava
+                                                            nzar columna a colu
+                                                            mna
+  386 00000264         ;---------------------------
+  387 00000264         
+  388 00000264         ;celda_eliminar_candidato(&cuadricula[r6],r12)
+  389 00000264         ;celda_eliminar_candidato
+  390 00000264         ;---------------------------
+  391 00000264 E3A0B040        mov              r11,#0x40   ;0000 0000 0100 000
+                                                            0
+  392 00000268 E1A0BC1B        mov              r11,r11,LSL r12 ;muevo el 1 tan
+                                                            tas posiciones como
+                                                             valor y así obteng
+                                                            o la máscara para e
+                                                            liminar el candidat
+                                                            o
+  393 0000026C         
+  394 0000026C E1D540B0        ldrh             r4,[r5]     ;r4 = mem[r5]
+  395 00000270 E184400B        orr              r4,r4,r11   ;r4 = or bit a bit 
+                                                            para poner a 1 el b
+                                                            it de r4 que está a
+                                                             1 en r3 y no tocar
+                                                             el resto
+  396 00000274 E1C540B0        strh             r4,[r5]     ;mem[r5] = r4
+  397 00000278         ;---------------------------
+  398 00000278         
+  399 00000278 E2855002        add              r5,r5,#2    ;avanza r6 en la re
+                                                            gión
+  400 0000027C E2866001        add              r6,r6,#1    ;avanza en la colum
+                                                            na
+  401 00000280 E156000A        cmp              r6,r10      ;se compara r3 (ini
+                                                            t_j que va avanzand
+                                                            o por las columnas)
+
+
+
+ARM Macro Assembler    Page 13 
+
+
+                                                             con end_j
+  402 00000284 1AFFFFF6        bne              arm_arm_for4
+  403 00000288         ;---------------------------
+  404 00000288         
+  405 00000288         
+  406 00000288 E2877001        add              r7,r7,#1    ;avanzar la fila en
+                                                             para for3
+  407 0000028C E1570009        cmp              r7,r9       ;se compara r7 (ini
+                                                            t_i que va avanzand
+                                                            o por las filas) co
+                                                            n end_i
+  408 00000290 1AFFFFF0        bne              arm_arm_for3
+  409 00000294         ;---------------------------
+  410 00000294         
+  411 00000294         
+  412 00000294 E8BD03C0        pop{r6-r9}
+  413 00000298         ;=======================================================
+                       ===================================
+  414 00000298         
+  415 00000298 E2588001 
+                       noPropagar
+                               subs             r8,r8,#1    ;una iteracion del 
+                                                            segundo for
+  416 0000029C 5AFFFFC4        bpl              arm_arm_b22 ;acaba cuando j < 0
+                                                             para calcular la c
+                                                            olumna 0
+  417 000002A0         
+  418 000002A0 E2577001        subs             r7,r7,#1    ;una iteracion del 
+                                                            primer for
+  419 000002A4 5AFFFFC0        bpl              arm_arm_b12 ;acaba cuando i < 0
+                                                             para calcular la f
+                                                            ila 0
+  420 000002A8         
+  421 000002A8 E1A00009        mov              r0,r9       ;se pasan las celda
+                                                            s vacías a r0 para 
+                                                            devolverlas
+  422 000002AC E8BD9FF0        POP              {r4-r12,pc}
+  423 000002B0         
+  424 000002B0                 END
+              00000000 
+Command Line: --debug --xref --diag_suppress=9931 --apcs=interwork --depend=.\o
+bjects\funciones.d -o.\objects\funciones.o -IC:\Keil_v5\ARM\RV31\INC -IC:\Keil_
+v5\ARM\CMSIS\Include -IC:\Keil_v5\ARM\INC\Philips --predefine="__EVAL SETA 1" -
+-predefine="__UVISION_VERSION SETA 526" --list=.\listings\funciones.lst funcion
+es.s
+
+
+
+ARM Macro Assembler    Page 1 Alphabetic symbol ordering
+Relocatable symbols
+
+datos 00000000
+
+Symbol: datos
+   Definitions
+      At line 1 in file funciones.s
+   Uses
+      None
+Comment: datos unused
+init_region 00000000
+
+Symbol: init_region
+   Definitions
+      At line 6 in file funciones.s
+   Uses
+      At line 173 in file funciones.s
+      At line 365 in file funciones.s
+
+2 symbols
+
+
+
+ARM Macro Assembler    Page 1 Alphabetic symbol ordering
+Relocatable symbols
+
+arm_arm_b11 0000016C
+
+Symbol: arm_arm_b11
+   Definitions
+      At line 236 in file funciones.s
+   Uses
+      At line 260 in file funciones.s
+Comment: arm_arm_b11 used once
+arm_arm_b12 000001AC
+
+Symbol: arm_arm_b12
+   Definitions
+      At line 269 in file funciones.s
+   Uses
+      At line 419 in file funciones.s
+Comment: arm_arm_b12 used once
+arm_arm_b21 00000174
+
+Symbol: arm_arm_b21
+   Definitions
+      At line 239 in file funciones.s
+   Uses
+      At line 257 in file funciones.s
+Comment: arm_arm_b21 used once
+arm_arm_b22 000001B4
+
+Symbol: arm_arm_b22
+   Definitions
+      At line 272 in file funciones.s
+   Uses
+      At line 416 in file funciones.s
+Comment: arm_arm_b22 used once
+arm_arm_for1 000001F4
+
+Symbol: arm_arm_for1
+   Definitions
+      At line 315 in file funciones.s
+   Uses
+      At line 331 in file funciones.s
+Comment: arm_arm_for1 used once
+arm_arm_for2 0000021C
+
+Symbol: arm_arm_for2
+   Definitions
+      At line 338 in file funciones.s
+   Uses
+      At line 354 in file funciones.s
+Comment: arm_arm_for2 used once
+arm_arm_for3 00000258
+
+Symbol: arm_arm_for3
+   Definitions
+      At line 375 in file funciones.s
+   Uses
+      At line 408 in file funciones.s
+Comment: arm_arm_for3 used once
+arm_arm_for4 00000264
+
+Symbol: arm_arm_for4
+
+
+
+ARM Macro Assembler    Page 2 Alphabetic symbol ordering
+Relocatable symbols
+
+   Definitions
+      At line 385 in file funciones.s
+   Uses
+      At line 402 in file funciones.s
+Comment: arm_arm_for4 used once
+b11 00000014
+
+Symbol: b11
+   Definitions
+      At line 30 in file funciones.s
+   Uses
+      At line 54 in file funciones.s
+Comment: b11 used once
+b12 00000054
+
+Symbol: b12
+   Definitions
+      At line 63 in file funciones.s
+   Uses
+      At line 88 in file funciones.s
+Comment: b12 used once
+b21 0000001C
+
+Symbol: b21
+   Definitions
+      At line 33 in file funciones.s
+   Uses
+      At line 51 in file funciones.s
+Comment: b21 used once
+b22 0000005C
+
+Symbol: b22
+   Definitions
+      At line 66 in file funciones.s
+   Uses
+      At line 85 in file funciones.s
+Comment: b22 used once
+candidatos_actualizar_arm 00000158
+
+Symbol: candidatos_actualizar_arm
+   Definitions
+      At line 228 in file funciones.s
+   Uses
+      At line 13 in file funciones.s
+Comment: candidatos_actualizar_arm used once
+candidatos_actualizar_arm_c 00000000
+
+Symbol: candidatos_actualizar_arm_c
+   Definitions
+      At line 22 in file funciones.s
+   Uses
+      At line 11 in file funciones.s
+Comment: candidatos_actualizar_arm_c used once
+candidatos_propagar_arm 0000009C
+
+Symbol: candidatos_propagar_arm
+   Definitions
+      At line 106 in file funciones.s
+   Uses
+
+
+
+ARM Macro Assembler    Page 3 Alphabetic symbol ordering
+Relocatable symbols
+
+      At line 12 in file funciones.s
+Comment: candidatos_propagar_arm used once
+cod 00000000
+
+Symbol: cod
+   Definitions
+      At line 10 in file funciones.s
+   Uses
+      None
+Comment: cod unused
+for1 000000B4
+
+Symbol: for1
+   Definitions
+      At line 125 in file funciones.s
+   Uses
+      At line 141 in file funciones.s
+Comment: for1 used once
+for2 000000DC
+
+Symbol: for2
+   Definitions
+      At line 146 in file funciones.s
+   Uses
+      At line 162 in file funciones.s
+Comment: for2 used once
+for3 00000118
+
+Symbol: for3
+   Definitions
+      At line 183 in file funciones.s
+   Uses
+      At line 215 in file funciones.s
+Comment: for3 used once
+for4 00000124
+
+Symbol: for4
+   Definitions
+      At line 192 in file funciones.s
+   Uses
+      At line 210 in file funciones.s
+Comment: for4 used once
+noPropagar 00000298
+
+Symbol: noPropagar
+   Definitions
+      At line 415 in file funciones.s
+   Uses
+      At line 285 in file funciones.s
+Comment: noPropagar used once
+21 symbols
+
+
+
+ARM Macro Assembler    Page 1 Alphabetic symbol ordering
+Absolute symbols
+
+NUM_COLUMNAS 00000010
+
+Symbol: NUM_COLUMNAS
+   Definitions
+      At line 5 in file funciones.s
+   Uses
+      None
+Comment: NUM_COLUMNAS unused
+NUM_FILAS 00000009
+
+Symbol: NUM_FILAS
+   Definitions
+      At line 3 in file funciones.s
+   Uses
+      At line 5 in file funciones.s
+      At line 25 in file funciones.s
+      At line 30 in file funciones.s
+      At line 58 in file funciones.s
+      At line 63 in file funciones.s
+      At line 124 in file funciones.s
+      At line 144 in file funciones.s
+      At line 231 in file funciones.s
+      At line 236 in file funciones.s
+      At line 264 in file funciones.s
+      At line 269 in file funciones.s
+      At line 314 in file funciones.s
+      At line 335 in file funciones.s
+
+PADDING 00000007
+
+Symbol: PADDING
+   Definitions
+      At line 4 in file funciones.s
+   Uses
+      At line 5 in file funciones.s
+Comment: PADDING used once
+3 symbols
+
+
+
+ARM Macro Assembler    Page 1 Alphabetic symbol ordering
+External symbols
+
+candidatos_propagar_c 00000000
+
+Symbol: candidatos_propagar_c
+   Definitions
+      At line 14 in file funciones.s
+   Uses
+      At line 82 in file funciones.s
+Comment: candidatos_propagar_c used once
+1 symbol
+361 symbols in table
