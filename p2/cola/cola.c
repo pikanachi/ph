@@ -25,25 +25,8 @@ void cola_guardar_eventos(Evento *e, Cola *c) {
         if (c->numEventos >= c->maxEventos) {
             c->prim = c->prim->sig;
             delete(c->prim->ant);
-            /* Activar el flag V
-             *
-		     * AREA datos, DATA
-             *  
-             * SET_V	EQU 0x10000000
-             * 
-		     * AREA codigo, CODE
-		     * ENTRY
-             * 
-		     * mrs r1,cpsr
-		     * orr r1,r1,#SET_V
-		     * MSR cpsr_cxsf,r1
-             * 
-             * cpsr
-             * -----------------------------------
-             * | n  | z  | c  | v  |        ...  |
-             * -----------------------------------
-             * | 31 | 30 | 29 | 28 |        ...0 |
-             */
+
+            activarFV();
 
         } else {
             c->numEventos ++;
