@@ -2,6 +2,7 @@
 #define COLA_H
 
 #include "evento.h"
+#include "funcExt.h"
 #include <stdint.h> // Para los uint
 #include <stddef.h> // Para NULL
 
