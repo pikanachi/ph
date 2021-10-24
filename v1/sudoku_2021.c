@@ -109,10 +109,7 @@ candidatos_actualizar_c_arm(CELDA cuadricula[NUM_FILAS][NUM_COLUMNAS])
 			if (esVacia(cuadricula[i][j])) {
 				celdas_vacias++;
 			} else {
-<<<<<<< HEAD
-=======
 				//ORIGINAL candidatos_propagar_c(cuadricula, i, j);
->>>>>>> bdf658cb08e30fa8d6256414d5da73ef6083ac75
 				candidatos_propagar_arm(cuadricula, i, j);
 			}
 		}
@@ -164,11 +161,11 @@ sudoku9x9(CELDA cuadricula_C_C[NUM_FILAS][NUM_COLUMNAS],
     //    /* Init arm con propagar c */
     celdas_vacias[3] = candidatos_actualizar_arm_c(cuadricula_ARM_C);
 	
-	  for (i=1; i < 4; ++i) {
-			if (celdas_vacias[i] != celdas_vacias[0]) {
-				return -1;
-			}
-		}
+	  //for (i=1; i < 4; ++i) {
+		//	if (celdas_vacias[i] != celdas_vacias[0]) {
+		//		return -1;
+		//	}
+		//}
 
     /* verificar que la lista de candidatos C_C calculada es correcta */
     correcto = cuadricula_candidatos_verificar(cuadricula_C_C,solucion);
