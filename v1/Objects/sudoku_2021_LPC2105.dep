@@ -1,12 +1,0 @@
-Dependencies for Project 'sudoku_2021', Target 'LPC2105': (DO NOT MODIFY !)
-F (.\Startup.s)(0x6152C1B9)(--cpu ARM7TDMI --pd "__EVAL SETA 1" -g --apcs=interwork -IC:\Keil_v5\ARM\RV31\INC-IC:\Keil_v5\ARM\CMSIS\Include-IC:\Keil_v5\ARM\INC\Philips--pd "__UVISION_VERSION SETA 526"--list .\listings\startup.lst --xref -o .\objects\startup.o --depend .\objects\startup.d)
-F (.\funciones.s)(0x6152E4DB)(--cpu ARM7TDMI --pd "__EVAL SETA 1" -g --apcs=interwork -IC:\Keil_v5\ARM\RV31\INC-IC:\Keil_v5\ARM\CMSIS\Include-IC:\Keil_v5\ARM\INC\Philips--pd "__UVISION_VERSION SETA 526"--list .\listings\funciones.lst --xref -o .\objects\funciones.o --depend .\objects\funciones.d)
-F (.\celda.h)(0x6152C1B9)()
-F (.\tableros.h)(0x6152C1B9)()
-F (.\sudoku_2021.c)(0x6152E43B)(--c99 --gnu -c --cpu ARM7TDMI -D__EVAL -g -O0 --apcs=interwork --split_sections-IC:\Keil_v5\ARM\RV31\INC-IC:\Keil_v5\ARM\CMSIS\Include-IC:\Keil_v5\ARM\INC\Philips-D__UVISION_VERSION="526"-o .\objects\sudoku_2021.o --omf_browse .\objects\sudoku_2021.crf --depend .\objects\sudoku_2021.d)
-I (C:\Keil_v5\ARM\ARMCC\include\stddef.h)(0x599F3DAC)
-I (sudoku_2021.h)(0x6152E156)
-I (C:\Keil_v5\ARM\ARMCC\include\inttypes.h)(0x599F3DAE)
-I (C:\Keil_v5\ARM\ARMCC\include\stdint.h)(0x599F3DAE)
-I (celda.h)(0x6152C1B9)
-I (tableros.h)(0x6152C1B9)
