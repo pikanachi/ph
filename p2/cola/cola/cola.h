@@ -57,4 +57,8 @@ Evento cola_ultimo();
  */
 extern void actualizarFV();
 
+
+//void imp_cola();
+
+
 #endif

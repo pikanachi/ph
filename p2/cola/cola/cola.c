@@ -1,6 +1,7 @@
 #include "cola.h"
+//#include <stdio.h>
 
-static Cola c;
+static Cola c;  //static para que no la lie al compilar con otras globales (otra var con el mismo nombre en otro c)
 
 /*
  * Crea la cola circular vacía, es decir, sin Evento.
@@ -11,6 +12,11 @@ void cola_crear_vacia() {
     c.indPrimEv = 0;
 }
 
+/*
+void actualizarFV() {
+    printf("FlagV\n");
+}
+*/
 
 /*
  * Si numEventos < maxEventos devuelve la cola circular resultante de añadir a c
@@ -33,7 +39,7 @@ void cola_guardar_evento(Evento e) {
 /* 
  * Si numEventos > 0, devuelve el Evento más antiguo de la cola (el primero) y devuelve la
  * cola circular resultante de eliminar de la cola dicho Evento. En caso contrario, devuelve
- * un Evento vacío.
+ * un Evento inválido.
  */
 Evento cola_desencola_mas_antiguo() {
     Evento e = eventoInvalido;
@@ -57,12 +63,25 @@ uint8_t cola_es_vacia() {
 
 /*
  * Si numEventos > 0, devuelve el Evento más nuevo encolado en la cola (el último). En caso contrario, devuelve
- * un evento vacío.
+ * un evento inválido.
  */
 Evento cola_ultimo() {
-    if (c.indProxEv-1 < 0) {  //Es el último
-        return c.eventos[MAX_EVENTOS-1];
-    } else {
-        return c.eventos[c.indProxEv-1];
+    Evento e = eventoInvalido;
+    if (!cola_es_vacia()) {
+        if (c.indProxEv-1 < 0) {  //Es el último
+            e = c.eventos[MAX_EVENTOS-1];
+        } else {
+            e = c.eventos[c.indProxEv-1];
+        }
     }
+    return e;
 }
+
+/*
+void imp_cola() {
+    for (int i = 0; i<MAX_EVENTOS; i++) {
+        printf("%d | ", c.eventos[i].ID_evento);
+    }
+    printf("\n");
+}
+*/

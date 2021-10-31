@@ -1,6 +1,6 @@
 #include "evento.h"
 
-Evento eventoInvalido = {INVALID_ID, 0, 0};
+static Evento eventoInvalido = {INVALID_ID, 0, 0};
 
 /*
  * Devuelve 1 si el evento tiene id 255 InvalidID.
