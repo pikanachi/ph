@@ -19,7 +19,7 @@ struct Cola {
 /*
  * Crea la cola circular vacía, es decir, sin Evento.
  */
-void cola_crear_vacia();
+void cola_crear_vacia(void);
 
 
 /*
@@ -35,21 +35,21 @@ void cola_guardar_evento(Evento e);
  * cola circular resultante de eliminar de la cola dicho Evento. En caso contrario, devuelve
  * un Evento vacío.
  */
-Evento cola_desencola_mas_antiguo();
+Evento cola_desencola_mas_antiguo(void);
 
 
 /*
  * Devuelve 1 (verdad) sí y sólo si la cola c no tiene ningún Evento.
  * devuelve 0 (falso) en caso contrario.
  */
-uint8_t cola_es_vacia();
+uint8_t cola_es_vacia(void);
 
 
 /*
  * Si numEventos > 0, devuelve el Evento más nuevo encolado en la cola (el último). En caso contrario, devuelve
  * un evento vacío.
  */
-Evento cola_ultimo();
+Evento cola_ultimo(void);
 
 
 /*
@@ -59,6 +59,6 @@ extern void actualizarFV();
 
 
 //void imp_cola();
-
+//void actualizarFV();
 
 #endif
