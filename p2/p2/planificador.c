@@ -1,7 +1,6 @@
 #include "planificador.h"
 
 
-#define TIME_PWDN 5000
 
 #define MAX_COLA 32
 
@@ -22,6 +21,9 @@ void planificador_main(void) {
 
 
     while(1) {
+				if(gIO_leer_overflow()){
+					while(1);
+				}
         if (!cola_es_vacia()) {
 					  Evento evento;
             evento = cola_desencola_mas_antiguo();
@@ -44,9 +46,7 @@ void planificador_main(void) {
                         gp_actualizar_estado_EINT2();
                         break;
                     case Pulsacion_EINT1 :
-											i = i + 1;
-                        //Hacer algo
-												//Escribir dato en la celda seleccionada
+												gIO_escribir_entrada();
                         break;
                     case Pulsacion_EINT2 :
 											i = i + 1;
@@ -56,6 +56,14 @@ void planificador_main(void) {
 										case Power_Down:
 												//Poner al procesador en modo powerDown
 												ge_modo_pwdwn();
+												break;
+										case Check_Entrada:
+												//Poner al procesador en modo powerDown
+												gIO_check_entrada();
+												break;
+										case Apagar_Validacion:
+												//Poner al procesador en modo powerDown
+												gIO_apagar_validacion();
 												break;
                 }
             }

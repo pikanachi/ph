@@ -1,4 +1,5 @@
 #include "cola.h"
+#include "gestor_IO.h"
 
 static Cola c;  //static para que no la lie al compilar con otras globales (otra var con el mismo nombre en otro c)
 
@@ -22,7 +23,8 @@ void cola_guardar_evento(Evento e) {
 
     if (!cola_es_vacia() && c.indPrimEv == c.indProxEv) {   //Overflow
         c.indPrimEv = (c.indPrimEv + 1) % MAX_EVENTOS;
-        actualizarFV();
+        //OVERFLOW
+				gIO_encender_overflow();
     }else{
         c.numEventos++;
     }

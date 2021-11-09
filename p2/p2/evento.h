@@ -34,8 +34,8 @@ enum {
     Pulsacion_EINT1 = 4,
     Pulsacion_EINT2 = 5,
     Power_Down = 6,
-    NOMBRE_EVENTO_7 = 7,
-    NOMBRE_EVENTO_8 = 8,
+    Check_Entrada = 7,
+    Apagar_Validacion = 8,
     NOMBRE_EVENTO_9 = 9,
     NOMBRE_EVENTO_10 = 10
 };

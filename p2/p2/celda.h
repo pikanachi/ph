@@ -63,4 +63,12 @@ static void elminaCandidatos(CELDA *celdaptr) {
 	*celdaptr = *celdaptr & 0x007F;
 }
 
+static int esPista(CELDA celda){
+	return celda & 0x0010;
+}
+
+static int celda_noEsCandidato(CELDA celda, uint8_t valor){
+	int mask = 1 << (8 + valor);
+	return mask & celda;
+}
 #endif // CELDA_H
