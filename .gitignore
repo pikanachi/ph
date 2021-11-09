@@ -2,4 +2,26 @@ p2/p2/*.o
 
 .DS_store
 
+p2/.DS_store
+
 p2/p2/*.d
+
+p2/p2/*.crf
+
+p2/p2/*.axf
+
+p2/p2/*.sct
+
+p2/p2/*.lnp
+
+p2/p2/*.dep
+
+p2/p2/*.pikanachi
+
+p2/p2/*.JUAN
+
+p2/p2/*.htm
+
+p2/p2/*.uvopt
+
+p2/p2/*.scvd
