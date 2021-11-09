@@ -351,7 +351,7 @@
           </ArmAdsMisc>
           <Cads>
             <interw>0</interw>
-            <Optim>4</Optim>
+            <Optim>1</Optim>
             <oTime>0</oTime>
             <SplitLS>0</SplitLS>
             <OneElfS>0</OneElfS>
@@ -560,6 +560,26 @@
               <FileName>idle_pwdwn.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\idle_pwdwn.c</FilePath>
+            </File>
+            <File>
+              <FileName>sudoku.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\sudoku.h</FilePath>
+            </File>
+            <File>
+              <FileName>celda.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\celda.h</FilePath>
+            </File>
+            <File>
+              <FileName>tableros.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\tableros.h</FilePath>
+            </File>
+            <File>
+              <FileName>sudoku.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\sudoku.c</FilePath>
             </File>
           </Files>
         </Group>

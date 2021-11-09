@@ -1,18 +1,25 @@
 #include "planificador.h"
 
+
+#define TIME_PWDN 5000
+
 #define MAX_COLA 32
 
 void planificador_main(void) {
-    //Inicializar gestores
+		int i;
+		//Empezar la cola de eventos
+		cola_crear_vacia();
+
+		//Inicializar gestores
 		GPIO_marcar_entrada(14,16);
 		GPIO_marcar_salida(30,2);
 		GPIO_marcar_salida(0,14);
-    ga_inicializar();
-    gIO_inicializar();
+		ga_inicializar();
+		gIO_inicializar();
     gp_inicializar();
+		ge_inicializar();
+		candidatos_actualizar_c(cuadricula_C_C);
 
-    //Empezar la cola de eventos
-    cola_crear_vacia();
 
     while(1) {
         if (!cola_es_vacia()) {
@@ -37,10 +44,14 @@ void planificador_main(void) {
                         gp_actualizar_estado_EINT2();
                         break;
                     case Pulsacion_EINT1 :
+											i = i + 1;
                         //Hacer algo
+												//Escribir dato en la celda seleccionada
                         break;
                     case Pulsacion_EINT2 :
+											i = i + 1;
                         //Hacer algo
+												//Borrar dato seleccionado
                         break;
 										case Power_Down:
 												//Poner al procesador en modo powerDown
@@ -48,8 +59,8 @@ void planificador_main(void) {
 												break;
                 }
             }
-        //} else { // Cola vacia
-            //ge_modo_IDE();
+        } else { // Cola vacia
+            ge_modo_IDE();
         }
     }
 }

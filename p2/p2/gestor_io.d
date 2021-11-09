@@ -3,3 +3,7 @@
 .\gestor_io.o: gpio.h
 .\gestor_io.o: C:\Keil_v5\ARM\INC\Philips\LPC210x.H
 .\gestor_io.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdint.h
+.\gestor_io.o: tableros.h
+.\gestor_io.o: celda.h
+.\gestor_io.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\inttypes.h
+.\gestor_io.o: sudoku.h

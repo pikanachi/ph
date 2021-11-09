@@ -4,6 +4,11 @@
 #include "idle_pwdwn.h"
 
 /*
+ * Inicia la alarma para poner al procesador a PWDOWN
+ */
+void ge_inicializar(void);
+
+/*
  * Pone al procesador en modo IDE
  */
 void ge_modo_IDE(void);

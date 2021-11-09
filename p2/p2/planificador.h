@@ -7,6 +7,10 @@
 #include "gestor_pulsacion.h"
 #include "gestor_energia.h"
 
+
+
+
+
 void planificador_main(void);
 
 #endif

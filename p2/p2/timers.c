@@ -1,7 +1,7 @@
 #include "timers.h"
 
 #define frecuencia 60                                   //Frecuencia del procesador
-#define ticks_by_msec 750
+#define ticks_by_msec 61476
 
 static volatile unsigned int timer1_int_count = 0;
 
@@ -53,7 +53,7 @@ void temporizador_empezar(void) {
  */
 int temporizador_leer(void) {
     int tiempo = (timer1_int_count * (0xFFFFFFFF / ticks_by_msec)) * 1000;  //tiempo en us
-    int pico = (T1TC/ticks_by_msec) * 1000;                      //pico que se suma(lo que llevamos)
+    int pico = (T1TC/ticks_by_msec) * (1000);                      //pico que se suma(lo que llevamos)
 
     return tiempo + pico;
 }

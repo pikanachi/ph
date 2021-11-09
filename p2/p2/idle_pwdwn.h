@@ -4,6 +4,8 @@
 #include <LPC210x.H>
 #include "timers.h"
 
+#define TIME_PWDN 5000
+
 /*
  * Pone al procesador en modo IDLE para ahorrar energía.
  */

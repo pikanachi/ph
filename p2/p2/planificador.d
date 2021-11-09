@@ -9,6 +9,10 @@
 .\planificador.o: gestor_alarmas.h
 .\planificador.o: gestor_IO.h
 .\planificador.o: gpio.h
+.\planificador.o: tableros.h
+.\planificador.o: celda.h
+.\planificador.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\inttypes.h
+.\planificador.o: sudoku.h
 .\planificador.o: gestor_pulsacion.h
 .\planificador.o: buttons.h
 .\planificador.o: gestor_pulsacion.h

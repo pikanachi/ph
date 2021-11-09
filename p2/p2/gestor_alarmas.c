@@ -26,7 +26,7 @@ void ga_comprobar_alarmas(void) {
 		int i;
     for (i = 0; i < NUM_EVENTOS; i++) {
         //Si ha pasado el tiempo para sacarla (/1000 para pasar de us a ms) y la alarma es valida
-        if ((temporizador_leer() / 1000 >= alarmasPendientes[i].timeToLeave) && alarmasPendientes[i].esValida == 1) {
+        if (((temporizador_leer() / 1000) >= alarmasPendientes[i].timeToLeave) && alarmasPendientes[i].esValida == 1) {
             Evento e;
             e.ID_evento = alarmasPendientes[i].IDevento;
             cola_guardar_evento(e);
@@ -75,7 +75,7 @@ uint8_t actualizar_alarma(Alarma al) {
                 retVal = 1;
             //Actualizar periodo
             } else {
-                alarmasPendientes[i].periodo = al.periodo;
+							alarmasPendientes[i].timeToLeave = (temporizador_leer() / 1000) + al.periodo;
                 retVal = 1;
             }
         }

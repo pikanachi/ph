@@ -86,7 +86,7 @@ static int candidatos_actualizar_c(CELDA cuadricula[NUM_FILAS][NUM_COLUMNAS])
 /* Init del sudoku en codigo C invocando a propagar en arm
  * Recibe la cuadricula como primer parametro
  * y devuelve en celdas_vacias el numero de celdas vacias
- */
+ *
 static int
 candidatos_actualizar_c_arm(CELDA cuadricula[NUM_FILAS][NUM_COLUMNAS])
 {
@@ -109,10 +109,6 @@ candidatos_actualizar_c_arm(CELDA cuadricula[NUM_FILAS][NUM_COLUMNAS])
 			if (esVacia(cuadricula[i][j])) {
 				celdas_vacias++;
 			} else {
-<<<<<<< HEAD
-=======
-				//ORIGINAL candidatos_propagar_c(cuadricula, i, j);
->>>>>>> bdf658cb08e30fa8d6256414d5da73ef6083ac75
 				candidatos_propagar_arm(cuadricula, i, j);
 			}
 		}
@@ -138,9 +134,10 @@ cuadricula_candidatos_verificar(CELDA cuadricula[NUM_FILAS][NUM_COLUMNAS],
     return correcto;
 }
 
-/* ************************************************************************
+ ************************************************************************
  * programa principal del juego que recibe el tablero
  */
+ /*
 int
 sudoku9x9(CELDA cuadricula_C_C[NUM_FILAS][NUM_COLUMNAS],
 	CELDA cuadricula_C_ARM[NUM_FILAS][NUM_COLUMNAS],
@@ -151,17 +148,17 @@ sudoku9x9(CELDA cuadricula_C_C[NUM_FILAS][NUM_COLUMNAS],
     int celdas_vacias[4];     //numero de celdas aun vacias
     int correcto = 0;
 	  size_t i;
-    /* calcula lista de candidatos, version C */
+    // calcula lista de candidatos, version C 
 		celdas_vacias[0] = candidatos_actualizar_c(cuadricula_C_C);
 
-    //    /* Init C con propagar arm */
+
     celdas_vacias[1] = candidatos_actualizar_c_arm(cuadricula_C_ARM);
 
-    //    /* Init arm con propagar arm */
+
     
 		celdas_vacias[2] = candidatos_actualizar_arm(cuadricula_ARM_ARM);
 
-    //    /* Init arm con propagar c */
+
     celdas_vacias[3] = candidatos_actualizar_arm_c(cuadricula_ARM_C);
 	
 	  for (i=1; i < 4; ++i) {
@@ -170,18 +167,20 @@ sudoku9x9(CELDA cuadricula_C_C[NUM_FILAS][NUM_COLUMNAS],
 			}
 		}
 
-    /* verificar que la lista de candidatos C_C calculada es correcta */
+
     correcto = cuadricula_candidatos_verificar(cuadricula_C_C,solucion);
     correcto += cuadricula_candidatos_verificar(cuadricula_ARM_ARM,solucion);
     correcto += cuadricula_candidatos_verificar(cuadricula_C_ARM,solucion);
     correcto += cuadricula_candidatos_verificar(cuadricula_ARM_C,solucion);
     return correcto;
 }
+*/
 
-// MAIN
+/* MAIN
 int main (void) {
     #include "tableros.h"
     int correcto = sudoku9x9(cuadricula_C_C, cuadricula_C_ARM, cuadricula_ARM_ARM, cuadricula_ARM_C, solucion);
 		while (1) { }
 }
+*/
 
