@@ -15,7 +15,7 @@ void eint1_ISR (void) __irq {
 	Evento ePulsacion;
 	int retardo;
 	VICIntEnClr = 0x00008000;    											// deshabilitar eint1 pone a 1 bit 15	
-	EXTINT =  EXTINT | 0x2;      		  								// clear interrupt flag <--------------------------REPASAR SE PONE 0X2 NO 1 NO???
+	EXTINT =  EXTINT | 0x2;      		  								// clear interrupt flag
 	VICVectAddr = 0;                     							// Acknowledge Interrupt
 
 	nueva_pulsacion_eint1 = 1;
@@ -34,7 +34,7 @@ void eint1_ISR (void) __irq {
 	//Actualizar contador para PWDOWN
 	retardo = TIME_PWDN & 0x007FFFFF;     						// Asegurarnos que el retardo es de 23bits
 	eAlarma.ID_evento = Set_Alarma;
-	eAlarma.auxData = Power_Down;  							// ID evento a generar
+	eAlarma.auxData = Power_Down;  										// ID evento a generar
 	eAlarma.auxData = eAlarma.auxData << 1;
 	eAlarma.auxData = eAlarma.auxData | 1;          	// Es periódica
 	eAlarma.auxData = eAlarma.auxData << 23;
@@ -57,7 +57,7 @@ void eint2_ISR (void) __irq {
 	int retardo;
 	
 	VICIntEnClr = 0x00010000;    											// deshabilitar eint2 pone a 1 bit 16
-	EXTINT =  EXTINT | 0x4;        										// clear interrupt flag   <--------------------------REPASAR SE PONE 0X2 NO 1 NO???     
+	EXTINT =  EXTINT | 0x4;        										// clear interrupt flag   
 	nueva_pulsacion_eint2 = 1;
 	
 	//Encolar alarma EINT1 a 100 ms
@@ -79,7 +79,7 @@ void eint2_ISR (void) __irq {
 	//Actualizar contador para PWDOWN
 	retardo = TIME_PWDN & 0x007FFFFF;     						// Asegurarnos que el retardo es de 23bits
 	eAlarma.ID_evento = Set_Alarma;
-	eAlarma.auxData = Power_Down;  							// ID evento a generar
+	eAlarma.auxData = Power_Down;  										// ID evento a generar
 	eAlarma.auxData = eAlarma.auxData << 1;
 	eAlarma.auxData = eAlarma.auxData | 1;          	// Es periódica
 	eAlarma.auxData = eAlarma.auxData << 23;
@@ -130,7 +130,7 @@ void button_enable_interrupts_2(void) {
  */
 void eint1_init (void) {
 	nueva_pulsacion_eint1 = 0;
-	EXTINT =  EXTINT | 0x2;     	                  // clear interrupt flag  <--------------------------REPASAR SE PONE 0X2 NO 1 NO???   	
+	EXTINT =  EXTINT | 0x2;     	                  // clear interrupt flag	
 	
   // configuration of the IRQ slot number 1 of the VIC for EXTINT1
 	VICVectAddr1 = (unsigned long)eint1_ISR;
@@ -147,7 +147,7 @@ void eint1_init (void) {
  */
 void eint2_init (void) {
 	nueva_pulsacion_eint2 = 0;
-	EXTINT =  EXTINT | 0x4; 	                      // clear interrupt flag   <--------------------------REPASAR SE PONE 0X4 NO 1 NO???   	
+	EXTINT =  EXTINT | 0x4; 	                      // clear interrupt flag	
 	
   // configuration of the IRQ slot number 3 of the VIC for EXTINT2
 	VICVectAddr2 = (unsigned long)eint2_ISR;

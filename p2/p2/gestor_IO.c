@@ -1,25 +1,24 @@
 #include "gestor_IO.h"
 
-/*
- * Inicializa la GPIO
- */
- 
-#define TIME_IO 200
+#define TIME_CHECK_IO 200
+#define TIME_VALI_LED 1000
  
 static uint8_t old_fila = 10;
 static uint8_t old_columna = 10;
 
-
-
- 
+/*
+ * Inicializa el gestor_IO iniciclizando la GPIO y pone una alarma periodica
+ * que Check_Entrada para mostrar en el GPIO el valor de la celda seleccionada
+ * (valor y candidatos)
+ */
 void gIO_inicializar(void) {
 	int retardo;
 	Evento eAlarma;
   GPIO_iniciar();
-	candidatos_actualizar_c(cuadricula_C_C);
-	retardo = TIME_IO & 0x007FFFFF;     						// Asegurarnos que el retardo es de 23bits
+	//candidatos_actualizar_c(cuadricula_C_C);
+	retardo = TIME_CHECK_IO & 0x007FFFFF;     				// Asegurarnos que el retardo es de 23bits
 	eAlarma.ID_evento = Set_Alarma;
-	eAlarma.auxData = Check_Entrada;  							// ID evento a generar
+	eAlarma.auxData = Check_Entrada;  								// ID evento a generar
 	eAlarma.auxData = eAlarma.auxData << 1;
 	eAlarma.auxData = eAlarma.auxData | 1;          	// Es periódica
 	eAlarma.auxData = eAlarma.auxData << 23;
@@ -28,8 +27,10 @@ void gIO_inicializar(void) {
 	cola_guardar_evento(eAlarma); 
 }
 
-
-
+/*
+ * Muestra el valor de los candidatos de la celda seleccionada (fila y columna) 
+ * en el GPIO
+ */
 void gIO_mostrar_candidatos(void){
 	uint16_t candidatos;
 	int fila, columna;
@@ -39,6 +40,9 @@ void gIO_mostrar_candidatos(void){
 	GPIO_escribir(4,9,candidatos);
 }
 
+/*
+ * Muestra el valor de la celda seleccionada (fila y columna) en el GPIO
+ */
 void gIO_mostrar_valor(void){
 	uint8_t valor;
 	int fila, columna;
@@ -48,14 +52,28 @@ void gIO_mostrar_valor(void){
 	GPIO_escribir(0,4,valor);
 }
 
+/*
+ * Escribe el bit de overfow del GPIO para saber si ha desbordado la
+ * cola de eventos
+ */
 void gIO_encender_overflow(void){
 	GPIO_escribir(30,1,1);
 }
 
+/*
+ * Lee el estado del bit de overfow del GPIO para saber si ha desbordado la
+ * cola de eventos
+ */
 int gIO_leer_overflow(void){
 	return GPIO_leer(30,1);
 }
 
+/*
+ * Si la fila y la columna introducidas por el usuario es invalida (>9)
+ * se enciende el led de validación (entrada invaida) sino si no tiene valor
+ * la celda se enciende el led de validacion. Finalmente se muestra el
+ * valor de la casilla seleccionada y sus candidatos en el GPIO
+ */
 void gIO_check_entrada(void){
 	int fila, columna;
 	fila = GPIO_leer(16,4);
@@ -77,6 +95,14 @@ void gIO_check_entrada(void){
 	}
 }
 
+/*
+ * Si la fila y la columna introducidas por el usuario es invalida (>9)
+ * se enciende el led de validación (entrada invaida) sino, si el valir introcucido
+ * por el usuario es válido (>= 1 y <= 9) y es uno de los posibles candidatos de la 
+ * celda,se enciende el led de validación durante 1000ms, se pone el valor introducido
+ * en la celda seleccionada, se actualizan los candidatos y se muestran en el GPIO los
+ * candidatos y el valor introducidos
+ */
 void gIO_escribir_entrada(void){
 	uint8_t valor;
 	int fila, columna;
@@ -92,11 +118,11 @@ void gIO_escribir_entrada(void){
 				int retardo;
 				Evento eAlarma;
 				gIO_encender_validacion();
-				retardo = 1000 & 0x007FFFFF;     						// Asegurarnos que el retardo es de 23bits
+				retardo = TIME_VALI_LED & 0x007FFFFF;     										// Asegurarnos que el retardo es de 23bits
 				eAlarma.ID_evento = Set_Alarma;
 				eAlarma.auxData = Apagar_Validacion;  							// ID evento a generar
 				eAlarma.auxData = eAlarma.auxData << 1;
-				eAlarma.auxData = eAlarma.auxData & 0;          	// Es periódica
+				eAlarma.auxData = eAlarma.auxData & 0;          		// No es periódica
 				eAlarma.auxData = eAlarma.auxData << 23;
 				eAlarma.auxData = eAlarma.auxData | retardo;
 				eAlarma.timestamp = temporizador_leer() / 1000;
@@ -110,10 +136,16 @@ void gIO_escribir_entrada(void){
 	}
 }
 
+/*
+ * Apaga el led de validación (bit 13 GPIO)
+ */
 void gIO_apagar_validacion(void){
 	GPIO_escribir(13,1,0);
 }
 
+/*
+ * Enciende el led de validación (bit 13 GPIO)
+ */
 void gIO_encender_validacion(void){
 	GPIO_escribir(13,1,1);
 }

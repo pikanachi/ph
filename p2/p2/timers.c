@@ -28,9 +28,9 @@ void timer1_ISR (void) __irq {
  * Inicializa el timer1 para que pueda ser usado
  */
 void temporizador_iniciar(void) {
-    VPBDIV = 0x00000001;                                //Para que no divida la frecuencia del reloj
+    VPBDIV = 0x00000001;                               //Para que no divida la frecuencia del reloj
 
-		T1MR0 = 0xFFFFFFFF;                                 //Se pone el mach register a 2^32-1 (max valor ticks)
+		T1MR0 = 0xFFFFFFFF;                                //Se pone el mach register a 2^32-1 (max valor ticks)
     T1MCR = 3;                                         // Generates an interrupt and resets the count when the value of MR0 is reached
 
 		VICVectAddr0 = (unsigned long)timer1_ISR;          // set the RSI

@@ -15,7 +15,7 @@ void idle(void) {
  * Pone al procesador en modo IDLE para ahorrar energía.
  */
 void pwdwn(void) {
-  EXTWAKE = 6;   // EXTINT1 will awake the processor and EXTINT2 will awake the processor
-	PCON |= 0x02;   // bit 1 = 1, when 1, this bit causes the processor clock to be stopped, while on-chip peripherals remain active. 
+  EXTWAKE = 6;   		// EXTINT1 will awake the processor and EXTINT2 will awake the processor
+	PCON |= 0x02;  	 	// bit 1 = 1, when 1, this bit causes the processor clock to be stopped, while on-chip peripherals remain active. 
                     // Any enabled interrupt from a peripheral or an external interrupt source will cause the processor to resume execution.
 }

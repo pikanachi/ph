@@ -1,7 +1,5 @@
 #include "planificador.h"
 
-
-
 #define MAX_COLA 32
 
 void planificador_main(void) {
@@ -18,7 +16,6 @@ void planificador_main(void) {
     gp_inicializar();
 		ge_inicializar();
 		candidatos_actualizar_c(cuadricula_C_C);
-
 
     while(1) {
 				if(gIO_leer_overflow()){
@@ -49,7 +46,7 @@ void planificador_main(void) {
 												gIO_escribir_entrada();
                         break;
                     case Pulsacion_EINT2 :
-											i = i + 1;
+												i = i + 1;
                         //Hacer algo
 												//Borrar dato seleccionado
                         break;

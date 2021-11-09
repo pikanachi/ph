@@ -467,11 +467,6 @@
               <FilePath>.\cola.c</FilePath>
             </File>
             <File>
-              <FileName>actualizarFV.s</FileName>
-              <FileType>2</FileType>
-              <FilePath>.\actualizarFV.s</FilePath>
-            </File>
-            <File>
               <FileName>planificador.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\planificador.c</FilePath>
@@ -481,46 +476,26 @@
               <FileType>5</FileType>
               <FilePath>.\planificador.h</FilePath>
             </File>
-            <File>
-              <FileName>gestor_alarmas.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\gestor_alarmas.h</FilePath>
-            </File>
-            <File>
-              <FileName>gestor_alarmas.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\gestor_alarmas.c</FilePath>
-            </File>
-            <File>
-              <FileName>timers.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\timers.h</FilePath>
-            </File>
-            <File>
-              <FileName>timers.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\timers.c</FilePath>
-            </File>
-            <File>
-              <FileName>gestor_IO.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\gestor_IO.h</FilePath>
-            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>gestor_IO</GroupName>
+          <Files>
             <File>
               <FileName>gestor_IO.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\gestor_IO.c</FilePath>
             </File>
             <File>
-              <FileName>gpio.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\gpio.c</FilePath>
-            </File>
-            <File>
-              <FileName>gpio.h</FileName>
+              <FileName>gestor_IO.h</FileName>
               <FileType>5</FileType>
-              <FilePath>.\gpio.h</FilePath>
+              <FilePath>.\gestor_IO.h</FilePath>
             </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>gestor_pulsacion</GroupName>
+          <Files>
             <File>
               <FileName>gestor_pulsacion.c</FileName>
               <FileType>1</FileType>
@@ -531,6 +506,81 @@
               <FileType>5</FileType>
               <FilePath>.\gestor_pulsacion.h</FilePath>
             </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>gestor_energia</GroupName>
+          <Files>
+            <File>
+              <FileName>gestor_energia.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\gestor_energia.c</FilePath>
+            </File>
+            <File>
+              <FileName>gestor_energia.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\gestor_energia.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>gestor_alarmas</GroupName>
+          <Files>
+            <File>
+              <FileName>gestor_alarmas.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\gestor_alarmas.c</FilePath>
+            </File>
+            <File>
+              <FileName>gestor_alarmas.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\gestor_alarmas.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>sudoku</GroupName>
+          <Files>
+            <File>
+              <FileName>sudoku.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\sudoku.c</FilePath>
+            </File>
+            <File>
+              <FileName>tableros.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\tableros.h</FilePath>
+            </File>
+            <File>
+              <FileName>celda.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\celda.h</FilePath>
+            </File>
+            <File>
+              <FileName>sudoku.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\sudoku.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>gpio</GroupName>
+          <Files>
+            <File>
+              <FileName>gpio.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\gpio.h</FilePath>
+            </File>
+            <File>
+              <FileName>gpio.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\gpio.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>buttons</GroupName>
+          <Files>
             <File>
               <FileName>buttons.c</FileName>
               <FileType>1</FileType>
@@ -541,16 +591,11 @@
               <FileType>5</FileType>
               <FilePath>.\buttons.h</FilePath>
             </File>
-            <File>
-              <FileName>gestor_energia.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\gestor_energia.h</FilePath>
-            </File>
-            <File>
-              <FileName>gestor_energia.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\gestor_energia.c</FilePath>
-            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>idle_pwdwn</GroupName>
+          <Files>
             <File>
               <FileName>idle_pwdwn.h</FileName>
               <FileType>5</FileType>
@@ -561,30 +606,22 @@
               <FileType>1</FileType>
               <FilePath>.\idle_pwdwn.c</FilePath>
             </File>
-            <File>
-              <FileName>sudoku.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\sudoku.h</FilePath>
-            </File>
-            <File>
-              <FileName>celda.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\celda.h</FilePath>
-            </File>
-            <File>
-              <FileName>tableros.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\tableros.h</FilePath>
-            </File>
-            <File>
-              <FileName>sudoku.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\sudoku.c</FilePath>
-            </File>
           </Files>
         </Group>
         <Group>
-          <GroupName>Documentation</GroupName>
+          <GroupName>timers</GroupName>
+          <Files>
+            <File>
+              <FileName>timers.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\timers.h</FilePath>
+            </File>
+            <File>
+              <FileName>timers.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\timers.c</FilePath>
+            </File>
+          </Files>
         </Group>
       </Groups>
     </Target>
