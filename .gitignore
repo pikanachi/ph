@@ -1,3 +1,5 @@
 p2/p2/*.o
 
 .DS_store
+
+p2/p2/*.d
