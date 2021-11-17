@@ -9,6 +9,8 @@ enum {
 	NO_PULSADO = 1
 };
 
+unsigned int gp_leer_pulsacion_1(void);
+
 /*
  * Inicializa las interrupciones en EINT1 y EINT2
  */

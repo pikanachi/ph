@@ -68,7 +68,8 @@ static int esPista(CELDA celda){
 }
 
 static int celda_noEsCandidato(CELDA celda, uint8_t valor){
-	int mask = 1 << (8 + valor);
-	return mask & celda;
+	int mask = 1 << (6 + valor);
+	mask = mask & celda;
+	return mask >> (6 + valor);
 }
 #endif // CELDA_H

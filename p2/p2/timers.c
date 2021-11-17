@@ -32,12 +32,12 @@ void temporizador_iniciar(void) {
 
 		T1MR0 = 0xFFFFFFFF;                                //Se pone el mach register a 2^32-1 (max valor ticks)
     T1MCR = 3;                                         // Generates an interrupt and resets the count when the value of MR0 is reached
-
-		VICVectAddr0 = (unsigned long)timer1_ISR;          // set the RSI
+		T1TCR = 1;
+		VICVectAddr3 = (unsigned long)timer1_ISR;          // set the RSI
    
     // 0x20 bit 5 enables vectored IRQs. 
     // 5 is the number of the interrupt assigned. Number 5 is the Timer 1 (see table 40 of the LPC2105 user manual  
-		VICVectCntl0 = 0x20 | 5;   
+		VICVectCntl3 = 0x20 | 5;   
     VICIntEnable = VICIntEnable | 0x00000020;          // Enable Timer1 Interrupt
 }
 

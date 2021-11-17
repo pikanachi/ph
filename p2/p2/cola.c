@@ -72,3 +72,7 @@ Evento cola_ultimo(void) {
     }
     return e;
 }
+
+void vaciar_cola(void){
+	c.numEventos = 0;
+}

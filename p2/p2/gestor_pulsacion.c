@@ -12,6 +12,14 @@ void gp_inicializar(void) {
     eint2_init();
 }
 
+unsigned int gp_leer_pulsacion_1(void){
+	unsigned int retVal = 0;
+	if(estado_pulsacion_EINT1 == PULSADO){
+		retVal = 1;
+	}
+	return retVal;
+}
+
 unsigned int leer_estado_1(void){
 	return estado_pulsacion_EINT1;
 }

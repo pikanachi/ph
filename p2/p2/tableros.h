@@ -2,9 +2,21 @@
 #define TABLEROS_H
 
 #include "celda.h"
+#include "sudoku.h"
 
 /* Tamanos de la cuadricula */
 /* Se utilizan 16 columnas para facilitar la visualizacion */
+
+void static borrar_tablero(CELDA cuadricula[NUM_FILAS][NUM_COLUMNAS]){
+	int i, j;
+	for (i=0; i < NUM_FILAS; i++) {
+		for (j=0; j < NUM_FILAS; j++) {
+			if (!esPista(cuadricula[i][j])) {
+				celda_poner_valor(&cuadricula[i][j], 0);
+			}
+		}
+	}
+}
 
 static CELDA
 cuadricula_C_C[NUM_FILAS][NUM_COLUMNAS] =
@@ -19,5 +31,6 @@ cuadricula_C_C[NUM_FILAS][NUM_COLUMNAS] =
 0x0016, 0x0000, 0x0000, 0x0000, 0x0018, 0x0000, 0x0000, 0x0000, 0x0000, 0, 0, 0, 0, 0, 0, 0,
 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0012, 0x0000, 0x0000, 0x0011, 0, 0, 0, 0, 0, 0, 0
 };
+
 
 #endif

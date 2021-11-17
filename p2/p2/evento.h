@@ -36,8 +36,8 @@ enum {
     Power_Down = 6,
     Check_Entrada = 7,
     Apagar_Validacion = 8,
-    NOMBRE_EVENTO_9 = 9,
-    NOMBRE_EVENTO_10 = 10
+    Terminar = 9,
+    Check_Pulsacion_Terminar = 10
 };
 
 /*

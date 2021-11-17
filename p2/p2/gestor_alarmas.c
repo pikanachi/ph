@@ -4,6 +4,9 @@
 
 Alarma alarmasPendientes[NUM_EVENTOS];
 
+void foo2(Alarma *al){
+	al[2].esValida = 0;
+}
 /*
  * Se inicializan con el programa a inválidas todas las alarmas y los timers
  */
@@ -15,7 +18,10 @@ void ga_inicializar(void) {
     for (i = 0; i < NUM_EVENTOS; i++) {
         alarmasPendientes[i].esValida = 0;  //Se inicializan las alarmas como no validas
     }
+				foo2(alarmasPendientes);
 }
+
+
 
 /*
  * Una vez que llega un evento de Temp_perio se comprueban las alarmas del gestor.

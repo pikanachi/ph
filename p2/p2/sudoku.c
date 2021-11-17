@@ -25,11 +25,11 @@ void candidatos_propagar_c(CELDA cuadricula[NUM_FILAS][NUM_COLUMNAS],
 
     // recorrer fila descartando valor de listas candidatos
     for (j=0;j<NUM_FILAS;j++)
-			celda_eliminar_candidato(&cuadricula[fila][j],valor);
+				celda_eliminar_candidato(&cuadricula[fila][j],valor);
 
     // recorrer columna descartando valor de listas candidatos
     for (i=0;i<NUM_FILAS;i++)
-			celda_eliminar_candidato(&cuadricula[i][columna],valor);
+				celda_eliminar_candidato(&cuadricula[i][columna],valor);
 
     // determinar fronteras región
     init_i = init_region[fila];
@@ -40,7 +40,7 @@ void candidatos_propagar_c(CELDA cuadricula[NUM_FILAS][NUM_COLUMNAS],
     // recorrer region descartando valor de listas candidatos
     for (i=init_i; i<end_i; i++) {
       for(j=init_j; j<end_j; j++) {
-	      celda_eliminar_candidato(&cuadricula[i][j],valor);
+					celda_eliminar_candidato(&cuadricula[i][j],valor);
 	    }
     }
 }
@@ -77,7 +77,7 @@ int candidatos_actualizar_c(CELDA cuadricula[NUM_FILAS][NUM_COLUMNAS])
 				celdas_vacias++;
 			} else {
 				//ORIGINAL candidatos_propagar_c(cuadricula, i, j);
-				candidatos_propagar_c(cuadricula, i, j);
+					candidatos_propagar_c(cuadricula, i, j);
 			}
 		}
 	}

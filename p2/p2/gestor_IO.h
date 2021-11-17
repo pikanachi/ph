@@ -55,6 +55,13 @@ void gIO_check_entrada(void);
  */
 void gIO_escribir_entrada(void);
 
+void gIO_eliminar_valor(void);
+
+void gIO_borrar_tablero(void);
+
+void gIO_encender_latido(void);
+
+void gIO_apagar_latido(void);
 /*
  * Apaga el led de validación (bit 13 GPIO)
  */

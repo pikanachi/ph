@@ -2,7 +2,7 @@
 
 #define TIME_AL_PUL 100
 
-#define TIME_PWDN 5000
+
 
 static volatile int nueva_pulsacion_eint1;
 static volatile int nueva_pulsacion_eint2;

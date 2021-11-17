@@ -29,6 +29,7 @@ void ge_modo_IDE(void) {
  * Pone al procesador en modo powerdown
  */
 void ge_modo_pwdwn(void) {
+		
     pwdwn();
 }
 

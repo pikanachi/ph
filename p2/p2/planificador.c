@@ -2,8 +2,10 @@
 
 #define MAX_COLA 32
 
+#define TIME_AL_PUL_TER 100
+
+
 void planificador_main(void) {
-		int i;
 		//Empezar la cola de eventos
 		cola_crear_vacia();
 
@@ -15,7 +17,7 @@ void planificador_main(void) {
 		gIO_inicializar();
     gp_inicializar();
 		ge_inicializar();
-		candidatos_actualizar_c(cuadricula_C_C);
+		//candidatos_actualizar_c(cuadricula_C_C);
 
     while(1) {
 				if(gIO_leer_overflow()){
@@ -25,6 +27,8 @@ void planificador_main(void) {
 					  Evento evento;
             evento = cola_desencola_mas_antiguo();
             if (es_valido(&evento)) {
+								int retardo;
+								Evento eAlarma;
                 switch(evento.ID_evento) {
                     case Temp_perio : //Evento 0
                         //Ha saltado el temporizador periódico
@@ -46,8 +50,7 @@ void planificador_main(void) {
 												gIO_escribir_entrada();
                         break;
                     case Pulsacion_EINT2 :
-												i = i + 1;
-                        //Hacer algo
+												gIO_eliminar_valor();
 												//Borrar dato seleccionado
                         break;
 										case Power_Down:
@@ -62,10 +65,41 @@ void planificador_main(void) {
 												//Poner al procesador en modo powerDown
 												gIO_apagar_validacion();
 												break;
+										case Terminar:
+												//Poner al procesador en modo powerDown
+												gIO_borrar_tablero();
+												retardo = TIME_AL_PUL_TER & 0x007FFFFF;     					// Asegurarnos que el retardo es de 23bits
+												eAlarma.ID_evento = Set_Alarma;
+												eAlarma.auxData = Check_Pulsacion_Terminar;  				// ID evento a generar
+												eAlarma.auxData = eAlarma.auxData << 1;
+												eAlarma.auxData = eAlarma.auxData | 1;         		// Es periódica
+												eAlarma.auxData = eAlarma.auxData << 23;
+												eAlarma.auxData = eAlarma.auxData | retardo;
+												eAlarma.timestamp = temporizador_leer() / 1000;
+												cola_guardar_evento(eAlarma); 
+												break;
+										case Check_Pulsacion_Terminar:
+												//Poner al procesador en modo powerDown
+												if(gp_leer_pulsacion_1() == 0){ // Se ha despulsado
+													retardo = 0;     					// Asegurarnos que el retardo es de 23bits
+													eAlarma.ID_evento = Set_Alarma;
+													eAlarma.auxData = Check_Pulsacion_Terminar;  				// ID evento a generar
+													eAlarma.auxData = eAlarma.auxData << 1;
+													eAlarma.auxData = eAlarma.auxData | 1;         		// Es periódica
+													eAlarma.auxData = eAlarma.auxData << 23;
+													eAlarma.auxData = eAlarma.auxData | retardo;
+													eAlarma.timestamp = temporizador_leer() / 1000;
+													cola_guardar_evento(eAlarma); 
+													vaciar_cola();
+													ge_modo_pwdwn();
+												}
+												break;
                 }
             }
         } else { // Cola vacia
+						gIO_encender_latido();
             ge_modo_IDE();
+						gIO_apagar_latido();
         }
     }
 }
