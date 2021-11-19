@@ -5,7 +5,7 @@
  * Devuelve 0 en caso contrario.
  */
 char es_valido(Evento *e){
-    return e->ID_evento != INVALID_ID;
+	return e->ID_evento != INVALID_ID;
 }
 
 Evento el_invalido(void) {

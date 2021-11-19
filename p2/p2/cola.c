@@ -7,9 +7,9 @@ static Cola c;  //static para que no la lie al compilar con otras globales (otra
  * Crea la cola circular vacía, es decir, sin Evento.
  */
 void cola_crear_vacia(void) {
-    c.numEventos = 0;
-    c.indProxEv = 0;
-    c.indPrimEv = 0;
+	c.numEventos = 0;
+	c.indProxEv = 0;
+	c.indPrimEv = 0;
 }
 
 
@@ -19,16 +19,16 @@ void cola_crear_vacia(void) {
  * el Evento más antiguo de la cola, activando el flag V (Overflow).
  */
 void cola_guardar_evento(Evento e) {
-    c.eventos[c.indProxEv] = e;
+	c.eventos[c.indProxEv] = e;
 
-    if (!cola_es_vacia() && c.indPrimEv == c.indProxEv) {   //Overflow
-        c.indPrimEv = (c.indPrimEv + 1) % MAX_EVENTOS;
-        //OVERFLOW
-				gIO_encender_overflow();
-    }else{
-        c.numEventos++;
-    }
-    c.indProxEv = (c.indProxEv + 1) % MAX_EVENTOS;
+	if (!cola_es_vacia() && c.indPrimEv == c.indProxEv) {   //Overflow
+		c.indPrimEv = (c.indPrimEv + 1) % MAX_EVENTOS;
+		//OVERFLOW
+		gIO_encender_overflow();
+	}else{
+		c.numEventos++;
+	}
+	c.indProxEv = (c.indProxEv + 1) % MAX_EVENTOS;
 }
 
 
@@ -38,13 +38,13 @@ void cola_guardar_evento(Evento e) {
  * un Evento inválido.
  */
 Evento cola_desencola_mas_antiguo(void) {
-    Evento e = el_invalido();
-    if(!cola_es_vacia()) {
-        e = c.eventos[c.indPrimEv];
-        c.indPrimEv = (c.indPrimEv + 1) % MAX_EVENTOS;
-        c.numEventos--;
-    }
-    return e;
+	Evento e = el_invalido();
+	if(!cola_es_vacia()) {
+		e = c.eventos[c.indPrimEv];
+		c.indPrimEv = (c.indPrimEv + 1) % MAX_EVENTOS;
+		c.numEventos--;
+	}
+	return e;
 }
 
 
@@ -53,7 +53,7 @@ Evento cola_desencola_mas_antiguo(void) {
  * devuelve 0 (falso) en caso contrario.
  */
 uint8_t cola_es_vacia(void) {
-    return c.numEventos == 0;
+	return c.numEventos == 0;
 }
 
 
@@ -62,17 +62,17 @@ uint8_t cola_es_vacia(void) {
  * un evento inválido.
  */
 Evento cola_ultimo(void) {
-    Evento e = eventoInvalido;
-    if (!cola_es_vacia()) {
-        if (c.indProxEv-1 < 0) {  //Es el último
-            e = c.eventos[MAX_EVENTOS-1];
-        } else {
-            e = c.eventos[c.indProxEv-1];
-        }
-    }
-    return e;
+	Evento e = eventoInvalido;
+	if (!cola_es_vacia()) {
+		if (c.indProxEv-1 < 0) {  //Es el último
+			e = c.eventos[MAX_EVENTOS-1];
+		} else {
+			e = c.eventos[c.indProxEv-1];
+		}
+	}
+	return e;
 }
 
 void vaciar_cola(void){
-	c.numEventos = 0;
+	cola_crear_vacia();
 }

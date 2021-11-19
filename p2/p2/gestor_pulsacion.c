@@ -63,17 +63,18 @@ void gp_actualizar_estado_EINT1(void) {
 		case PULSADO:
 			if (entrada == 0) { // se ha despulsado el boton
 				estado_pulsacion_EINT1 = NO_PULSADO;
-                button_enable_interrupts_1();
-								//Cancelar alarma EINT1
-								retardo = 0;     					// Asegurarnos que el retardo es de 23bits
-								eAlarma.ID_evento = Set_Alarma;
-								eAlarma.auxData = Check_Pulsacion_EINT1;  				// ID evento a generar
-								eAlarma.auxData = eAlarma.auxData << 1;
-								eAlarma.auxData = eAlarma.auxData | 1;         		// Es periódica
-								eAlarma.auxData = eAlarma.auxData << 23;
-								eAlarma.auxData = eAlarma.auxData | retardo;
-								eAlarma.timestamp = temporizador_leer() / 1000;
-								cola_guardar_evento(eAlarma); 
+				button_enable_interrupts_1();
+				
+				//Cancelar alarma EINT1
+				retardo = 0;
+				eAlarma.ID_evento = Set_Alarma;
+				eAlarma.auxData = Check_Pulsacion_EINT1;  				// ID evento a generar
+				eAlarma.auxData = eAlarma.auxData << 1;
+				eAlarma.auxData = eAlarma.auxData | 1;         		// Es periódica
+				eAlarma.auxData = eAlarma.auxData << 23;
+				eAlarma.auxData = eAlarma.auxData | retardo;
+				eAlarma.timestamp = temporizador_leer() / 1000;
+				cola_guardar_evento(eAlarma); 
 			}
 			break;
 		case NO_PULSADO:
@@ -98,17 +99,18 @@ void gp_actualizar_estado_EINT2(void) {
 		case PULSADO:
 			if (entrada == 0) { // se ha despulsado el boton
 				estado_pulsacion_EINT2 = NO_PULSADO;
-                button_enable_interrupts_2();
-								//Cancelar alarma EINT2
-								retardo = 0;     					// Asegurarnos que el retardo es de 23bits
-								eAlarma.ID_evento = Set_Alarma;
-								eAlarma.auxData = Check_Pulsacion_EINT2;  				// ID evento a generar
-								eAlarma.auxData = eAlarma.auxData << 1;
-								eAlarma.auxData = eAlarma.auxData | 1;         		// Es periódica
-								eAlarma.auxData = eAlarma.auxData << 23;
-								eAlarma.auxData = eAlarma.auxData | retardo;
-								eAlarma.timestamp = temporizador_leer() / 1000;
-								cola_guardar_evento(eAlarma); 
+				button_enable_interrupts_2();
+				
+				//Cancelar alarma EINT2
+				retardo = 0;
+				eAlarma.ID_evento = Set_Alarma;
+				eAlarma.auxData = Check_Pulsacion_EINT2;  				// ID evento a generar
+				eAlarma.auxData = eAlarma.auxData << 1;
+				eAlarma.auxData = eAlarma.auxData | 1;         		// Es periódica
+				eAlarma.auxData = eAlarma.auxData << 23;
+				eAlarma.auxData = eAlarma.auxData | retardo;
+				eAlarma.timestamp = temporizador_leer() / 1000;
+				cola_guardar_evento(eAlarma); 
 			}
 			break;
 		case NO_PULSADO:
