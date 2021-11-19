@@ -1,0 +1,135 @@
+1. La cola
+Antes del diseño de la cola pensamos en como representar los eventos que 
+guardara, asi que definimos en evento.h un struct que se compone de lo siguiente:
+	1. Un entero de 8 bits para el identificador del mismo
+	2. Un entero de 32 bits para la informacion necesaria que se necesite
+	     para tratar con el evento
+	3. Un entero de 32 bits que guarda el tiempo en ms que fue creado
+	     el evento 
+
+Para los distintos identificadores de los eventos definimos una enumeracion:
+	Temp_perio = 0
+    	Set_Alarma = 1
+    	Check_Pulsacion_EINT1 = 2
+    	Check_Pulsacion_EINT2 = 3
+    	Pulsacion_EINT1 = 4
+    	Pulsacion_EINT2 = 5
+    	Power_Down = 6
+    	Check_Entrada = 7
+    	Apagar_Validacion = 8
+    	Terminar = 9
+    	Check_Pulsacion_Terminar = 10
+creada a partir de la implementacion del sistema completo.
+
+Ademas añadimos una funcion es_valido(Evento* e) para saber que eventos son validos.
+
+Para el diseño de la cola creamos un struct que se compone de lo siguiente:
+	1. Array de "Eventos" de tamaño 32
+	2. Un entero que guarda el indice del evento mas antiguo
+	3. Un entero que guarda el indice del siguiente evento encolado
+	4. Un entero que cuente el numero de eventos guardados en el array
+
+Creamos las operaciones basicas para gestionar una cola:
+	1. cola_crear_vacia() para crear una cola vacia
+	2. cola_guardar_evento(Evento e) para añadir un evento a la cola y 
+	    en caso de pasarnos activar el led de overflow del GPIO
+	3. cola_desencola_mas_antigua() para sacar de la cola el evento mas
+	    antiguo y devolverlo
+	4. cola_es_vacia() para comprobar si la cola es vacia, devuelve 1
+	    en caso afirmativo y 0 en caso contrario
+	5. cola_ultimo() devuelve el evento mas nuevo encolado
+
+2. Los temporizadores
+
+Para el desarrollo del sistema se utilizará el timer0 para la gestion de las alarmas
+y el timer1 para medir el tiempo del sistema.
+
+Creamos las siguientes operaciones para interactuar con los temporizadores:
+
+	llevaremos la cuenta de las interrupciones del timer1 con un entero volatil
+
+	1. temporizador iniciar() que configura el timer1 para que interrumpa el numero minimo de veces
+		osea, cada 2^32 - 1 tics de reloj, ademas de configurar el reloj de los relojes para que trabajen a
+		la maxima frecuencia posible. Tambien habilitamos sus interrupciones y le asignamos su RSI
+
+		1.1 timer_ISR() aumentamos la cuenta de interrupciones del timer1	
+	2. temporizador_empezar() pone en marcha el timer1
+	3. temporizador_leer() devuelve en us el tiempo del sistema
+	4. temporizador_parar() para el timer1 y devuelve en us el tiempo del sistema
+	5. temporizador_periodico(int periodo) configura el timer0 para generar una interrupcion cada <periodo> ms
+		y se habilita sus interrupciones ademas de asignarle su RSI
+
+		5.1 timer0_ISR() encola un evento de comprobar alarmas en la cola de eventos 
+
+2.1 Gestor de alarmas
+	ESTO TU NACHO :3
+
+
+3. GPIO
+
+Para la interaccion con el GPIO creamos gpio.h con distintas operaciones:
+
+	1. GPIO_iniciar() que configura los pines del GPIO para que este de acuerdo al sistema
+		bit 31: output | bit 30: output | bit 27-24: input | bit 23-20: input | bit 19-16: input | bit 15-14: input | bit 13: output | bit 12-4 : output | bit 3-0: output
+	2. GPIO_leer(uint8_t bit_inicial, uint8_t num_bits) que devuelve un entero de 32 bits 
+		con los bits leidos desde <bit_inicial> hasta <bit_inicial> + <num_bits>
+	3. GPIO_escribir(uint8_t bit_inicial, uint8_t num_bits, uint32_t valor) que escribe <valor> desde
+		<bit_inicial> hasta <bit_inicial> + <num_bits> y en el caso de que <valor> tuviese mas bits
+		que <num_bits> escribira los de menos peso
+	4. GPIO_marcar_entrada(uint8_t bit_inicial, uint8_t num_bits) configura el GPIO para que los bits
+		desde <bit_inicial> hasta <bit_inicial> + <num_bits> sean leds de entrada
+	5. GPIO_marcar_salida(uint8_t bit_inicial, uint8_t num_bits) configura el GPIO para que los bits
+		desde <bit_inicial> hasta <bit_inicial> + <num_bits> sean leds de salida
+
+HASTA LA implementacion del juego tu nacho :3
+
+6. Integracion de la I/O en el juego
+
+Como ya se ha mostrado antes se configuran los leds del GPIO para este cometido:
+	- GPIO0-3: valor de la celda seleccionada
+	- GPIO4-12: candidatos de la celda seleccionada
+	- GPIO13: led validar entrada o mostrar error en la celda
+		seleccionada
+	- GPIO14: EINT1 (escribir dato en celda seleccionada)
+	- GPIO15: EINT2 (borrar dato celda seleccionada)
+	- GPIO16-19: Fila seleccionada (de 1 a 9)
+	- GPIO20-23: Columna seleccionada (de 1 a 9)
+	- GPIO24-27: nuevo valor a introducir (de 1 a 9)
+	- GPIO30: overflow
+	- GPIO31: latido modo idle
+
+	6.1 Gestor I/O
+
+	Creamos un gestor de entrada y salida que permita al planificador interactuar con el usuario,
+	para ello creamos las siguientes operaciones:
+
+		1. gIO_inicializar() prepara el tablero del sudoku para empear a jugar y prepara una alarma
+			periodica para comprobar cambios en la entrada del GPIO
+		2. gIO_mostrar_candidatos() muestra los candidatos en el GPIO de la celda seleccionada
+			con los bits (16-19) del GPIO para la fila y (20-23) del GPIO para la columna
+		3. gIO_mostrar_calor() muestra el valor en el GPIO de la celda seleccionada
+			con los bits (16-19) del GPIO para la fila y (20-23) del GPIO para la columna
+		4. gIO_encender_overflow() enciende el led de overflow del GPIO
+		5. gIO_leer_overflow() devuelve el valor del led de overflow del GPIO
+		6. gIO_check_entrada() compruba si hay cambios en la entrada del GPIO, en caso de haberla
+			se pueden dar los siguientes casos:
+				6.1 La fila y la columna seleccionados superan a los del sudoku, por lo tanto encenderemos el led de error
+				6.2 La celda seleccionada es una pista, por lo tanto encenderemos el led de error
+		7. gIO_escribir_entrada() funcion a la que llamara el planificador cuando el usuario pulse el led 14 del GPIO,
+			comprobara que la fila y la columna seleccionada esta dentro del sudoku, si no lo esta encendera el led de error,
+			y comprobara si es la jugada de terminacion(fila 0 columna 0 valor 0), momento en el que encolara el evento de terminar,
+			en caso contrario escribira el valor en la celda si es candidato de la misma y no intenta escribir en una pista,
+			si ocurre, se encendera el led de error. Despues de escribir, se actualizaran los candidatos del sudoku y se mostrara en el GPIO
+			el valor y los candidatos de la celda actualizada
+		8. gIO_eliminar_valorfuncion a la que llamara el planificador cuando el usuario pulse el led 15 del GPIO,
+			comprobara que la fila y la columna seleccionada esta dentro del sudoku, si no lo esta encendera el led de error,
+			y si no es una pista borrara el valor de la celda y se actualizaran los candidatos del sudoku y se mostrara en el GPIO
+			el valor y los candidatos de la celda actualizada
+		9. gIO_borrar_tablero funcion que borra todas las jugadas del tablero
+		10. gIO_apagar_validacion() apaga el led de validacion
+		11. gIO_encender_validacion() enciende el led de validacion
+		12. gIO_apagar_latido() apaga el led de latido
+		13. gIO_encender_latido() enciende el led de latido
+
+	
+	ENCARGATE DE LO DEMAS NACHO :3
