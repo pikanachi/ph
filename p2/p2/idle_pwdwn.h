@@ -5,7 +5,7 @@
 #include "timers.h"
 
 //PARA TESTEAR
-#define TIME_PWDN 50000
+#define TIME_PWDN 15000
 
 /*
  * Pone al procesador en modo IDLE para ahorrar energía.

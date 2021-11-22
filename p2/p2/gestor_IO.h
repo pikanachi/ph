@@ -62,6 +62,8 @@ void gIO_borrar_tablero(void);
 void gIO_encender_latido(void);
 
 void gIO_apagar_latido(void);
+
+void gIO_alternar_latido(void);
 /*
  * Apaga el led de validación (bit 13 GPIO)
  */

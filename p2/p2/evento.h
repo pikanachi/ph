@@ -37,7 +37,8 @@ enum {
     Check_Entrada = 7,
     Apagar_Validacion = 8,
     Terminar = 9,
-    Check_Pulsacion_Terminar = 10
+    Check_Pulsacion_Terminar = 10,
+		Latido = 11
 };
 
 /*

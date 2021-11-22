@@ -2,6 +2,7 @@
 #include "idle_pwdwn.h"
 
 #define TIME_CHECK_IO 200
+#define LATIDO 125
 #define TIME_VALI_LED 1000
 
  
@@ -21,6 +22,16 @@ void gIO_inicializar(void) {
 	retardo = TIME_CHECK_IO & 0x007FFFFF;     				// Asegurarnos que el retardo es de 23bits
 	eAlarma.ID_evento = Set_Alarma;
 	eAlarma.auxData = Check_Entrada;  								// ID evento a generar
+	eAlarma.auxData = eAlarma.auxData << 1;
+	eAlarma.auxData = eAlarma.auxData | 1;          	// Es periódica
+	eAlarma.auxData = eAlarma.auxData << 23;
+	eAlarma.auxData = eAlarma.auxData | retardo;
+	eAlarma.timestamp = temporizador_leer() / 1000;
+	cola_guardar_evento(eAlarma); 
+	
+	retardo = LATIDO & 0x007FFFFF;     				// Asegurarnos que el retardo es de 23bits
+	eAlarma.ID_evento = Set_Alarma;
+	eAlarma.auxData = Latido;  								// ID evento a generar
 	eAlarma.auxData = eAlarma.auxData << 1;
 	eAlarma.auxData = eAlarma.auxData | 1;          	// Es periódica
 	eAlarma.auxData = eAlarma.auxData << 23;
@@ -121,8 +132,10 @@ void gIO_check_entrada(void){
  * candidatos y el valor introducidos
  */
 void gIO_escribir_entrada(void){
+	int tiempo;
 	uint8_t valor;
 	int fila, columna;
+	tiempo = temporizador_leer();
 	fila = GPIO_leer(16,4);
 	columna = GPIO_leer(20,4);
 	if(fila > 9 || columna > 9){
@@ -160,6 +173,7 @@ void gIO_escribir_entrada(void){
 						candidatos_actualizar_c(cuadricula_C_C);
 						gIO_mostrar_candidatos();
 						gIO_mostrar_valor();
+						tiempo = temporizador_leer() - tiempo;
 					}
 				}
 			}
@@ -216,10 +230,14 @@ void gIO_encender_validacion(void){
 }
 
 void gIO_encender_latido(void){
-	int l31 = GPIO_leer(31,1);
 	GPIO_escribir(31,1,1);
 }
 
 void gIO_apagar_latido(void){
 	GPIO_escribir(31,1,0);
+}
+
+void gIO_alternar_latido(void){
+	int l31 = GPIO_leer(31,1);
+	GPIO_escribir(31,1,(l31+1)%2);
 }

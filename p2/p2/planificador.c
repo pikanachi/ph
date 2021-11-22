@@ -96,12 +96,12 @@ void planificador_main(void) {
 							ge_modo_pwdwn();
 						}
 						break;
+					case Latido:
+						gIO_alternar_latido();
 				}
 			}
 		} else { // Cola vacia
-			gIO_encender_latido();
 			ge_modo_IDE();
-			gIO_apagar_latido();
 		}
 	}
 }
