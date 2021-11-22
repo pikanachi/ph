@@ -32,6 +32,3 @@ void ge_modo_pwdwn(void) {
 		
     pwdwn();
 }
-
-
-//FALTA COMO PADO DE MODO IDLE A POWERDOWN OSEA COMO SE DECIDE ESO SI YA ESTOY EN IDLE?

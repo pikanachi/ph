@@ -55,15 +55,33 @@ void gIO_check_entrada(void);
  */
 void gIO_escribir_entrada(void);
 
+/*
+ * Borra el valor de la fila y columna seleccionadas (si fila y columna <=9 y >= 1)
+ * y si el valor de la celda no esPista
+ */
 void gIO_eliminar_valor(void);
 
+/*
+ * borra el tablero para poner los valores iniciales de nuevo
+ */
 void gIO_borrar_tablero(void);
 
+/*
+ * Enciende el bit 31 del GPIO
+ */
 void gIO_encender_latido(void);
 
+/*
+ * Apaga el bit 31 del GPIO
+ */
 void gIO_apagar_latido(void);
 
+/*
+ * Alterna el latido del GPIO encendiendo el bit 31 
+ * si estaba apagado y apagandolo si estaba encendido
+ */
 void gIO_alternar_latido(void);
+
 /*
  * Apaga el led de validación (bit 13 GPIO)
  */

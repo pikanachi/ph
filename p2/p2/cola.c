@@ -73,6 +73,10 @@ Evento cola_ultimo(void) {
 	return e;
 }
 
+
+/*
+ * Llama a crearVacia
+ */
 void vaciar_cola(void){
 	cola_crear_vacia();
 }

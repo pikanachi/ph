@@ -52,12 +52,7 @@ Evento cola_ultimo(void);
 
 
 /*
- * Activa el Flag V que indica que ha ocurrido un desbordamiento.
- */
-extern void actualizarFV(void);
-
-/*
- * Marca numEventos = 0
+ * Llama a crearVacia
  */
 void vaciar_cola(void);
 

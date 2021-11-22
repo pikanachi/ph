@@ -160,11 +160,11 @@ void gIO_escribir_entrada(void){
 						int retardo;
 						Evento eAlarma;
 						gIO_encender_validacion();
-						retardo = TIME_VALI_LED & 0x007FFFFF;     										// Asegurarnos que el retardo es de 23bits
+						retardo = TIME_VALI_LED & 0x007FFFFF;     							// Asegurarnos que el retardo es de 23bits
 						eAlarma.ID_evento = Set_Alarma;
-						eAlarma.auxData = Apagar_Validacion;  							// ID evento a generar
+						eAlarma.auxData = Apagar_Validacion;  									// ID evento a generar
 						eAlarma.auxData = eAlarma.auxData << 1;
-						eAlarma.auxData = eAlarma.auxData & 0xFFFFFFFE;          		// No es periódica
+						eAlarma.auxData = eAlarma.auxData & 0xFFFFFFFE;         // No es periódica
 						eAlarma.auxData = eAlarma.auxData << 23;
 						eAlarma.auxData = eAlarma.auxData | retardo;
 						eAlarma.timestamp = temporizador_leer() / 1000;
@@ -229,14 +229,25 @@ void gIO_encender_validacion(void){
 	GPIO_escribir(13,1,1);
 }
 
+/*
+ * Enciende el bit 31 del GPIO
+ */
 void gIO_encender_latido(void){
 	GPIO_escribir(31,1,1);
 }
 
+/*
+ * Apaga el bit 31 del GPIO
+ */
 void gIO_apagar_latido(void){
 	GPIO_escribir(31,1,0);
 }
 
+
+/*
+ * Alterna el latido del GPIO encendiendo el bit 31 
+ * si estaba apagado y apagandolo si estaba encendido
+ */
 void gIO_alternar_latido(void){
 	int l31 = GPIO_leer(31,1);
 	GPIO_escribir(31,1,(l31+1)%2);
