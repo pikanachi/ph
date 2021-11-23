@@ -1,0 +1,9 @@
+.\idle_pwdwn.o: idle_pwdwn.c
+.\idle_pwdwn.o: idle_pwdwn.h
+.\idle_pwdwn.o: C:\Keil_v5\ARM\INC\Philips\LPC210x.H
+.\idle_pwdwn.o: timers.h
+.\idle_pwdwn.o: gestor_alarmas.h
+.\idle_pwdwn.o: timers.h
+.\idle_pwdwn.o: evento.h
+.\idle_pwdwn.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdint.h
+.\idle_pwdwn.o: cola.h
