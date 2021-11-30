@@ -2,7 +2,6 @@
 #define IDLE_PWDWN_H
 
 #include <LPC210x.H>
-#include "timers.h"
 
 //PARA TESTEAR
 #define TIME_PWDN 15000

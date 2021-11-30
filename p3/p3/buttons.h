@@ -3,8 +3,7 @@
 
 #include <LPC210x.H>
 #include "gestor_pulsacion.h"
-#include "evento.h"
-#include "timers.h"
+#include "gestor_alarmas.h"
 #include "idle_pwdwn.h"
 
 

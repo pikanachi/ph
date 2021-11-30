@@ -11,39 +11,23 @@ static volatile int nueva_pulsacion_eint2;
  * ISR para las EINT1
  */
 void eint1_ISR (void) __irq {
-	Evento eAlarma;
 	Evento ePulsacion;
 	int retardo;
-	VICIntEnClr = 0x00008000;    											// deshabilitar eint1 pone a 1 bit 15	
 	EXTINT =  EXTINT | 0x2;      		  								// clear interrupt flag
 	VICVectAddr = 0;                     							// Acknowledge Interrupt
-
+	VICIntEnClr = 0x00008000;    											// deshabilitar eint1 pone a 1 bit 15	
 	nueva_pulsacion_eint1 = 1;
 	
 	//Encolar alarma EINT1 a 100 ms
   retardo = TIME_AL_PUL & 0x007FFFFF;     					// Asegurarnos que el retardo es de 23bits
-  eAlarma.ID_evento = Set_Alarma;
-  eAlarma.auxData = Check_Pulsacion_EINT1;  				// ID evento a generar
-  eAlarma.auxData = eAlarma.auxData << 1;
-  eAlarma.auxData = eAlarma.auxData | 1;          	// Es periódica
-  eAlarma.auxData = eAlarma.auxData << 23;
-  eAlarma.auxData = eAlarma.auxData | retardo;
-  eAlarma.timestamp = temporizador_leer() / 1000;
-  cola_guardar_evento(eAlarma);             				// Se encola el evento   
+	set_Alarma(Check_Pulsacion_EINT1, retardo, 1);             				// Se encola el evento   
 	
 	//Actualizar contador para PWDOWN
 	retardo = TIME_PWDN & 0x007FFFFF;     						// Asegurarnos que el retardo es de 23bits
-	eAlarma.ID_evento = Set_Alarma;
-	eAlarma.auxData = Power_Down;  										// ID evento a generar
-	eAlarma.auxData = eAlarma.auxData << 1;
-	eAlarma.auxData = eAlarma.auxData | 1;          	// Es periódica
-	eAlarma.auxData = eAlarma.auxData << 23;
-	eAlarma.auxData = eAlarma.auxData | retardo;
-	eAlarma.timestamp = temporizador_leer() / 1000;
-	cola_guardar_evento(eAlarma); 
+	set_Alarma(Power_Down, retardo, 1);
 	//Encolar evento de pulsacion
   ePulsacion.ID_evento = Pulsacion_EINT1;
-  ePulsacion.timestamp = temporizador_leer() / 1000;
+  //ePulsacion.timestamp = temporizador_leer() / 1000;
   cola_guardar_evento(ePulsacion); 
 }
 
@@ -52,7 +36,6 @@ void eint1_ISR (void) __irq {
  * ISR para las EINT2
  */
 void eint2_ISR (void) __irq {
-	Evento eAlarma;
 	Evento ePulsacion;
 	int retardo;
 	
@@ -62,30 +45,16 @@ void eint2_ISR (void) __irq {
 	
 	//Encolar alarma EINT1 a 100 ms
   retardo = TIME_AL_PUL & 0x007FFFFF;     					// Asegurarnos que el retardo es de 23bits
-  eAlarma.ID_evento = Set_Alarma;
-  eAlarma.auxData = Check_Pulsacion_EINT2;  				// ID evento a generar
-  eAlarma.auxData = eAlarma.auxData << 1;
-  eAlarma.auxData = eAlarma.auxData | 1;         		// Es periódica
-  eAlarma.auxData = eAlarma.auxData << 23;
-  eAlarma.auxData = eAlarma.auxData | retardo;
-  eAlarma.timestamp = temporizador_leer() / 1000;
-	cola_guardar_evento(eAlarma); 
+  set_Alarma(Check_Pulsacion_EINT2, retardo, 1);
 	
 	//Encolar evento de pulsacion
   ePulsacion.ID_evento = Pulsacion_EINT2;
-  ePulsacion.timestamp = temporizador_leer() / 1000;
+  //ePulsacion.timestamp = temporizador_leer() / 1000;
   cola_guardar_evento(ePulsacion); 
 	
 	//Actualizar contador para PWDOWN
 	retardo = TIME_PWDN & 0x007FFFFF;     						// Asegurarnos que el retardo es de 23bits
-	eAlarma.ID_evento = Set_Alarma;
-	eAlarma.auxData = Power_Down;  										// ID evento a generar
-	eAlarma.auxData = eAlarma.auxData << 1;
-	eAlarma.auxData = eAlarma.auxData | 1;          	// Es periódica
-	eAlarma.auxData = eAlarma.auxData << 23;
-	eAlarma.auxData = eAlarma.auxData | retardo;
-	eAlarma.timestamp = temporizador_leer() / 1000;
-	cola_guardar_evento(eAlarma); 
+	set_Alarma(Power_Down, retardo, 1);
 	VICVectAddr = 0;                     							// Acknowledge Interrupt
 }
 

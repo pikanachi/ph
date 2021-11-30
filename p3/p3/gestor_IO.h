@@ -1,8 +1,7 @@
 #ifndef GESTOR_IO_H
 #define GESTOR_IO_H
 
-#include "evento.h"
-#include "timers.h"
+#include "gestor_alarmas.h"
 #include "gpio.h"
 #include "tableros.h"
 #include "sudoku.h"

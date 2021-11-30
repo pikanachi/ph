@@ -6,3 +6,5 @@
 .\timers.o: evento.h
 .\timers.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdint.h
 .\timers.o: cola.h
+.\timers.o: softI.h
+.\timers.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\inttypes.h

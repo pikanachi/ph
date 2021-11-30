@@ -1,6 +1,9 @@
 --cpu ARM7TDMI
 ".\startup.o"
+".\swi.o"
 ".\retarget.o"
+".\softi.o"
+".\fiq.o"
 ".\main.o"
 ".\evento.o"
 ".\cola.o"

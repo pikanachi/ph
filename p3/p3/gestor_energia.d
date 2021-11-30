@@ -2,9 +2,11 @@
 .\gestor_energia.o: gestor_energia.h
 .\gestor_energia.o: idle_pwdwn.h
 .\gestor_energia.o: C:\Keil_v5\ARM\INC\Philips\LPC210x.H
-.\gestor_energia.o: timers.h
 .\gestor_energia.o: gestor_alarmas.h
 .\gestor_energia.o: timers.h
+.\gestor_energia.o: gestor_alarmas.h
 .\gestor_energia.o: evento.h
 .\gestor_energia.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdint.h
 .\gestor_energia.o: cola.h
+.\gestor_energia.o: softI.h
+.\gestor_energia.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\inttypes.h

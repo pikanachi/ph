@@ -5,6 +5,7 @@
 #include "timers.h"
 #include "evento.h"
 #include "cola.h"
+#include "softI.h"
 
 typedef struct Alarma Alarma;
 
@@ -17,6 +18,8 @@ struct Alarma {
     int        timeToLeave;        //tiempo en el que se ha de sacar la alarma en ms
 };
 
+
+void set_Alarma(uint8_t id, int periodo, int periodica);
 
 /*
  * Se inicializan con el programa a inválidas todas las alarmas y los timers

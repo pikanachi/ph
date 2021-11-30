@@ -2,3 +2,11 @@
 .\relojes.o: relojes.h
 .\relojes.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdint.h
 .\relojes.o: C:\Keil_v5\ARM\INC\Philips\LPC210x.H
+.\relojes.o: softI.h
+.\relojes.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\inttypes.h
+.\relojes.o: timers.h
+.\relojes.o: gestor_alarmas.h
+.\relojes.o: timers.h
+.\relojes.o: evento.h
+.\relojes.o: cola.h
+.\relojes.o: softI.h

@@ -1,5 +1,6 @@
 #include "cola.h"
 #include "gestor_IO.h"
+#include "softI.h"
 
 static Cola c;  //static para que no la lie al compilar con otras globales (otra var con el mismo nombre en otro c)
 
@@ -19,6 +20,7 @@ void cola_crear_vacia(void) {
  * el Evento más antiguo de la cola, activando el flag V (Overflow).
  */
 void cola_guardar_evento(Evento e) {
+	disable_isr_fiq();
 	c.eventos[c.indProxEv] = e;
 
 	if (!cola_es_vacia() && c.indPrimEv == c.indProxEv) {   //Overflow
@@ -29,6 +31,7 @@ void cola_guardar_evento(Evento e) {
 		c.numEventos++;
 	}
 	c.indProxEv = (c.indProxEv + 1) % MAX_EVENTOS;
+	enable_isr_fiq();
 }
 
 
@@ -38,12 +41,15 @@ void cola_guardar_evento(Evento e) {
  * un Evento inválido.
  */
 Evento cola_desencola_mas_antiguo(void) {
-	Evento e = el_invalido();
+	Evento e;
+	disable_isr_fiq();
+	e = el_invalido();
 	if(!cola_es_vacia()) {
 		e = c.eventos[c.indPrimEv];
 		c.indPrimEv = (c.indPrimEv + 1) % MAX_EVENTOS;
 		c.numEventos--;
 	}
+	enable_isr_fiq();
 	return e;
 }
 

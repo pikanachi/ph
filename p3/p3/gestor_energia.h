@@ -2,6 +2,8 @@
 #define GESTOR_ENERGIA_H
 
 #include "idle_pwdwn.h"
+#include "gestor_alarmas.h"
+
 
 /*
  * Inicia la alarma para poner al procesador a PWDOWN

@@ -27,7 +27,7 @@ void ga_comprobar_alarmas(void) {
 		int i;
     for (i = 0; i < NUM_EVENTOS; i++) {
         //Si ha pasado el tiempo para sacarla (/1000 para pasar de us a ms) y la alarma es valida
-        if (((temporizador_leer() / 1000) >= alarmasPendientes[i].timeToLeave) && alarmasPendientes[i].esValida == 1) {
+        if (((clock_gettime() / 1000) >= alarmasPendientes[i].timeToLeave) && alarmasPendientes[i].esValida == 1) {
             Evento e;
             e.ID_evento = alarmasPendientes[i].IDevento;
             cola_guardar_evento(e);
@@ -36,7 +36,7 @@ void ga_comprobar_alarmas(void) {
             if (!alarmasPendientes[i].esPeriodica) {
 							alarmasPendientes[i].esValida = 0;
             } else { //es periodica
-							alarmasPendientes[i].timeToLeave = (temporizador_leer() / 1000) + alarmasPendientes[i].periodo;
+							alarmasPendientes[i].timeToLeave = (clock_gettime() / 1000) + alarmasPendientes[i].periodo;
 						}
         }
     }
@@ -59,6 +59,25 @@ Alarma crear_alarma(Evento e) {
     return al;
 }
 
+void set_Alarma(uint8_t id, int periodo, int periodica){
+		int retardo;
+		Evento eAlarma;
+		retardo = periodo & 0x007FFFFF;     						// Asegurarnos que el retardo es de 23bits
+		eAlarma.ID_evento = Set_Alarma;
+		eAlarma.auxData = id;  							// ID evento a generar
+		eAlarma.auxData = eAlarma.auxData << 1;
+		if(periodica == 1){
+			eAlarma.auxData = eAlarma.auxData | periodica;          	// Es periódica
+		}
+		else{
+			eAlarma.auxData = eAlarma.auxData & 0xFFFFFFFE;         // No es periódica
+		}
+		eAlarma.auxData = eAlarma.auxData << 23;
+		eAlarma.auxData = eAlarma.auxData | retardo;
+		eAlarma.timestamp = clock_gettime() / 1000;
+		cola_guardar_evento(eAlarma); 
+}
+
 /*
  * Operación interna: Comprueba si tengo alguna alarma pendiente cuyo ID sea el de al.
  * Si lo es y es periódica entonces, si el período es 0 la cancela, sino la actualiza.
@@ -76,7 +95,7 @@ uint8_t actualizar_alarma(Alarma al) {
                 retVal = 1;
             //Actualizar periodo
             } else {
-							alarmasPendientes[i].timeToLeave = (temporizador_leer() / 1000) + al.periodo;
+							alarmasPendientes[i].timeToLeave = (clock_gettime() / 1000) + al.periodo;
                 retVal = 1;
             }
         }
@@ -111,6 +130,6 @@ void ga_guardar_evento(Evento e) {
 void ga_encolar_evento_temp(void) {
     Evento e;
     e.ID_evento = Temp_perio;
-    e.timestamp = temporizador_leer() / 1000;   // En ms
+    e.timestamp = clock_gettime() / 1000;   // En ms
     cola_guardar_evento(e);
 }

@@ -1,5 +1,5 @@
 #include "gestor_pulsacion.h"
-#include "timers.h"
+
 
 static unsigned int estado_pulsacion_EINT1 = NO_PULSADO;
 static unsigned int estado_pulsacion_EINT2 = NO_PULSADO;
@@ -52,7 +52,7 @@ unsigned int leer_entrada_2(void) {
 void gp_actualizar_estado_EINT1(void) {
 	unsigned int estado, entrada;
 	int retardo;
-	Evento eAlarma;
+	
 	
 	if (button_nueva_pulsacion_1() == 1) { //ha habido una nueva pulsacion se ajusta el estado
 		estado_pulsacion_EINT1 = PULSADO;
@@ -67,14 +67,7 @@ void gp_actualizar_estado_EINT1(void) {
 				
 				//Cancelar alarma EINT1
 				retardo = 0;
-				eAlarma.ID_evento = Set_Alarma;
-				eAlarma.auxData = Check_Pulsacion_EINT1;  				// ID evento a generar
-				eAlarma.auxData = eAlarma.auxData << 1;
-				eAlarma.auxData = eAlarma.auxData | 1;         		// Es periódica
-				eAlarma.auxData = eAlarma.auxData << 23;
-				eAlarma.auxData = eAlarma.auxData | retardo;
-				eAlarma.timestamp = temporizador_leer() / 1000;
-				cola_guardar_evento(eAlarma); 
+				set_Alarma(Check_Pulsacion_EINT1, retardo, 1);
 			}
 			break;
 		case NO_PULSADO:
@@ -88,7 +81,7 @@ void gp_actualizar_estado_EINT1(void) {
 void gp_actualizar_estado_EINT2(void) {
 	unsigned int estado, entrada;
 	int retardo;
-	Evento eAlarma;
+	
 	
 	if (button_nueva_pulsacion_2() == 1) { //ha habido una nueva pulsacion se ajusta el estado
 		estado_pulsacion_EINT2 = PULSADO;
@@ -103,14 +96,7 @@ void gp_actualizar_estado_EINT2(void) {
 				
 				//Cancelar alarma EINT2
 				retardo = 0;
-				eAlarma.ID_evento = Set_Alarma;
-				eAlarma.auxData = Check_Pulsacion_EINT2;  				// ID evento a generar
-				eAlarma.auxData = eAlarma.auxData << 1;
-				eAlarma.auxData = eAlarma.auxData | 1;         		// Es periódica
-				eAlarma.auxData = eAlarma.auxData << 23;
-				eAlarma.auxData = eAlarma.auxData | retardo;
-				eAlarma.timestamp = temporizador_leer() / 1000;
-				cola_guardar_evento(eAlarma); 
+				set_Alarma(Check_Pulsacion_EINT2, retardo, 1);
 			}
 			break;
 		case NO_PULSADO:

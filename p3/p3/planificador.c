@@ -10,6 +10,8 @@ void planificador_main(void) {
 	//Empezar la cola de eventos
 	cola_crear_vacia();
 	RTC_init();
+	//WD_init(10);
+
 	//Inicializar gestores
 	GPIO_marcar_entrada(14,16);
 	GPIO_marcar_salida(30,2);
@@ -18,6 +20,7 @@ void planificador_main(void) {
 	gIO_inicializar();
 	gp_inicializar();
 	ge_inicializar();
+		WD_feed();
 
 	while(1) {
 		if(gIO_leer_overflow()){

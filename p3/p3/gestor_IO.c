@@ -16,28 +16,13 @@ static uint8_t old_columna = 10;
  */
 void gIO_inicializar(void) {
 	int retardo;
-	Evento eAlarma;
   GPIO_iniciar();
 	candidatos_actualizar_c(cuadricula_C_C);
 	retardo = TIME_CHECK_IO & 0x007FFFFF;     				// Asegurarnos que el retardo es de 23bits
-	eAlarma.ID_evento = Set_Alarma;
-	eAlarma.auxData = Check_Entrada;  								// ID evento a generar
-	eAlarma.auxData = eAlarma.auxData << 1;
-	eAlarma.auxData = eAlarma.auxData | 1;          	// Es periódica
-	eAlarma.auxData = eAlarma.auxData << 23;
-	eAlarma.auxData = eAlarma.auxData | retardo;
-	eAlarma.timestamp = temporizador_leer() / 1000;
-	cola_guardar_evento(eAlarma); 
+	set_Alarma(Check_Entrada, retardo, 1);
 	
 	retardo = LATIDO & 0x007FFFFF;     				// Asegurarnos que el retardo es de 23bits
-	eAlarma.ID_evento = Set_Alarma;
-	eAlarma.auxData = Latido;  								// ID evento a generar
-	eAlarma.auxData = eAlarma.auxData << 1;
-	eAlarma.auxData = eAlarma.auxData | 1;          	// Es periódica
-	eAlarma.auxData = eAlarma.auxData << 23;
-	eAlarma.auxData = eAlarma.auxData | retardo;
-	eAlarma.timestamp = temporizador_leer() / 1000;
-	cola_guardar_evento(eAlarma); 
+	set_Alarma(Latido, retardo, 1);
 	
 
 }
@@ -99,7 +84,6 @@ void gIO_check_entrada(void){
 	else{
 		if(!(old_fila == fila && old_columna == columna)){
 			int retardo;
-			Evento eAlarma;
 			gIO_apagar_validacion();
 			if(!esPista(cuadricula_C_C[fila][columna])){
 				gIO_apagar_validacion();
@@ -111,14 +95,7 @@ void gIO_check_entrada(void){
 			//---------------------------------------------
 			//Actualizar contador para PWDOWN
 			retardo = TIME_PWDN & 0x007FFFFF;     						// Asegurarnos que el retardo es de 23bits
-			eAlarma.ID_evento = Set_Alarma;
-			eAlarma.auxData = Power_Down;  										// ID evento a generar
-			eAlarma.auxData = eAlarma.auxData << 1;
-			eAlarma.auxData = eAlarma.auxData | 1;          	// Es periódica
-			eAlarma.auxData = eAlarma.auxData << 23;
-			eAlarma.auxData = eAlarma.auxData | retardo;
-			eAlarma.timestamp = temporizador_leer() / 1000;
-			cola_guardar_evento(eAlarma); 
+			set_Alarma(Power_Down, retardo, 1);
 		}
 	}
 }
@@ -158,17 +135,9 @@ void gIO_escribir_entrada(void){
 				else{
 					if(!celda_noEsCandidato(cuadricula_C_C[fila][columna],valor)){
 						int retardo;
-						Evento eAlarma;
 						gIO_encender_validacion();
 						retardo = TIME_VALI_LED & 0x007FFFFF;     							// Asegurarnos que el retardo es de 23bits
-						eAlarma.ID_evento = Set_Alarma;
-						eAlarma.auxData = Apagar_Validacion;  									// ID evento a generar
-						eAlarma.auxData = eAlarma.auxData << 1;
-						eAlarma.auxData = eAlarma.auxData & 0xFFFFFFFE;         // No es periódica
-						eAlarma.auxData = eAlarma.auxData << 23;
-						eAlarma.auxData = eAlarma.auxData | retardo;
-						eAlarma.timestamp = temporizador_leer() / 1000;
-						cola_guardar_evento(eAlarma); 
+						set_Alarma(Apagar_Validacion, retardo, 0);
 						celda_poner_valor(&cuadricula_C_C[fila][columna], valor);
 						candidatos_actualizar_c(cuadricula_C_C);
 						gIO_mostrar_candidatos();
@@ -191,17 +160,9 @@ void gIO_eliminar_valor(void){
 	else{
 		if(!esPista(cuadricula_C_C[fila][columna])){
 			int retardo;
-			Evento eAlarma;
 			gIO_encender_validacion();
 			retardo = TIME_VALI_LED & 0x007FFFFF;     										// Asegurarnos que el retardo es de 23bits
-			eAlarma.ID_evento = Set_Alarma;
-			eAlarma.auxData = Apagar_Validacion;  							// ID evento a generar
-			eAlarma.auxData = eAlarma.auxData << 1;
-			eAlarma.auxData = eAlarma.auxData & 0xFFFFFFFE;          		// No es periódica
-			eAlarma.auxData = eAlarma.auxData << 23;
-			eAlarma.auxData = eAlarma.auxData | retardo;
-			eAlarma.timestamp = temporizador_leer() / 1000;
-			cola_guardar_evento(eAlarma); 
+			set_Alarma(Apagar_Validacion, retardo, 0); 
 			celda_poner_valor(&cuadricula_C_C[fila][columna], 0);
 			candidatos_actualizar_c(cuadricula_C_C);
 			gIO_mostrar_candidatos();

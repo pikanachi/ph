@@ -1,0 +1,11 @@
+.\softi.o: softI.c
+.\softi.o: softI.h
+.\softi.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\inttypes.h
+.\softi.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdint.h
+.\softi.o: timers.h
+.\softi.o: gestor_alarmas.h
+.\softi.o: C:\Keil_v5\ARM\INC\Philips\LPC210x.H
+.\softi.o: timers.h
+.\softi.o: evento.h
+.\softi.o: cola.h
+.\softi.o: softI.h

@@ -2,7 +2,7 @@
 #define GESTOR_PULSACION_H
 
 #include "buttons.h"
-#include "cola.h"
+#include "gestor_alarmas.h"
 
 enum {
 	PULSADO = 0,
