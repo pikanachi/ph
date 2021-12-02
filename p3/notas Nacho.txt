@@ -1,0 +1,3 @@
+En debug session View -> periodic Window Update para que se actualice el GPIO
+
+Ahora el tablero lo tienes en 0x4000001A

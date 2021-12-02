@@ -59,6 +59,8 @@ USR_Stack_Size  EQU     0x00000400
 
 Stack_Size      EQU     (UND_Stack_Size + SVC_Stack_Size + ABT_Stack_Size + \
                          FIQ_Stack_Size + IRQ_Stack_Size + USR_Stack_Size)
+						 
+				PRESERVE8 {TRUE}
 
                 AREA    STACK, NOINIT, READWRITE, ALIGN=3
 Stack_Mem       SPACE   Stack_Size

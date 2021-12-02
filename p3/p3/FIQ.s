@@ -1,7 +1,9 @@
 ENMASK			EQU		0x18030
 VICIntEnable	EQU		0xFFFFF010
 VICIntEnClr		EQU		0xFFFFF014
-                PRESERVE8                      ; 8-Byte aligned Stack
+
+				PRESERVE8
+					
                 AREA    SWI_Area, CODE, READONLY
                 ARM
 
