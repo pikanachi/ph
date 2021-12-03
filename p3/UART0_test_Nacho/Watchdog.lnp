@@ -1,0 +1,7 @@
+--cpu ARM7TDMI
+".\startup.o"
+".\retarget.o"
+".\main.o"
+".\serial_port.o"
+--strict --scatter ".\Watchdog.sct"
+--summary_stderr --info summarysizes -o .\Watchdog.axf
