@@ -6,36 +6,26 @@
 #define MAX_SEND_BUFFER 	10
 #define MAX_REC_BUFFER 	10
 
-char car;
+char frase[10];
 
 // send_buffer
 static char send_buffer[MAX_SEND_BUFFER];
 static uint8_t index_send_buffer = 0;
 static uint8_t size_send_buffer = 0;
-static uint8_t terminado = 1;
+static uint8_t terminado = 0;
 
 static char rec_buffer[MAX_REC_BUFFER];
 static uint8_t index_rec_buffer = 0;
 
-/*
- * Al generarse una interrupcion y seguir habiendo caracteres
- * en el send_buffer continua enviando el mensaje a la UART0
- */
-/*void continuar_msj(void) {
-	if (size_send_buffer > 0){
-		U0THR = send_buffer[index_send_buffer_read];
-		index_send_buffer_read = (index_send_buffer_read + 1) % MAX_SEND_BUFFER;
-		size_send_buffer--;
-	}else
-		terminado = 1;
-}*/
-
 void continuar_msj(void){
-	if (index_send_buffer < size_send_buffer){
+	if (index_send_buffer < size_send_buffer){						// Mirar si hemos llagado al final del mensaje
 		U0THR = send_buffer[index_send_buffer];
 		index_send_buffer++;
-	}else
+	}
+	//if (index_send_buffer >= size_send_buffer) {
+	else {
 		terminado = 1;
+	}
 }
 
 uint8_t ha_terminado(void){
@@ -53,18 +43,28 @@ void serial_ISR (void) __irq {
 	mask &= U0IIR; 																			 		// Interrupt ID register (if read clears the interrupt)
 	
 	// Recibo datos de UART0 (3:1 = 010) (pg 88)
-	if (mask == 0x4) { 																	 		
-		// Appendear mensaje al buffer  
-		//car = U0RBR;																		 		// Receiver send_buffer Register (nos da el caracter introducido en la UART)
-		rec_buffer[index_rec_buffer] = U0RBR;
-		if (rec_buffer[index_rec_buffer] == '!') {
-			//hacer lo que sea que diga la accion
-			
-			//reiniciar el buffer para leer otro mensaje
-			index_rec_buffer = 0;
-		} else {
-			index_rec_buffer++;
-		}
+	if (mask == 0x4) {																														
+		if (index_rec_buffer < MAX_REC_BUFFER) {							// Appendear mensaje al buffer si cabe para no irnos de vacas por la memoria
+			rec_buffer[index_rec_buffer] = U0RBR;								// Receiver send_buffer RBR Register (nos da el caracter introducido en la UART)
+			if (rec_buffer[index_rec_buffer] == '!') {					// Fin del mensaje
+				//hacer lo que sea que diga la accion
+				if (strcmp(rec_buffer, "#RST!") == 0) {
+					// Terminar partida
+					strcpy(frase, "terminar");
+				} else if (strcmp(rec_buffer, "#NEW!") == 0) {
+					// Nueva partida
+					strcpy(frase, "nueva");
+				} else if (strcmp(rec_buffer, "#FCVS!") == 0) {
+					// Jugada
+					strcpy(frase, "jugada");
+				}
+				index_rec_buffer = 0;															// Reiniciar el buffer para leer otro mensaje
+			} else {
+				index_rec_buffer++;
+			}
+		} else {	
+			index_rec_buffer = 0;																// Hemos llenado el buffer, resetear
+		}	
 	} 
 	// Escribo datos en UART0 (3:1 = 010) (pg 88)
 	else if (mask == 0x2) { 	
@@ -86,10 +86,38 @@ void init_serial_byInterrupt (void)  {        // Initialize Serial Interface
 	
 	//habilitar interrupciones de uart1
 	VICIntEnable = VICIntEnable | 0x00000040; 
-	VICVectAddr0 = (unsigned long)serial_ISR;
-	VICVectCntl0 = 0x20 | 6;
+	VICVectAddr5 = (unsigned long)serial_ISR;
+	VICVectCntl5 = 0x20 | 6;
 	U0IER = U0IER | 0x3;												// Interrupt Enable Register, habilitar las RBR (Receiver send_buffer Register) y las THR (Transmit Holding Register)
 }
+
+void enviar_string(char *string) {
+	index_send_buffer = 0;
+	size_send_buffer = 0;
+	terminado = 0;
+	
+	//Copiar el string a mi 'send_buffer' y controlar que no nos salgamos del limite
+	while (string[size_send_buffer] != '\0' && size_send_buffer < MAX_SEND_BUFFER) {
+		send_buffer[size_send_buffer] = string[size_send_buffer];
+		size_send_buffer++;
+	}
+
+	U0THR = send_buffer[index_send_buffer]; 							//manda el primer caracter a la UART0
+	index_send_buffer++;
+}
+
+/*
+ * Al generarse una interrupcion y seguir habiendo caracteres
+ * en el send_buffer continua enviando el mensaje a la UART0
+ */
+/*void continuar_msj(void) {
+	if (size_send_buffer > 0){
+		U0THR = send_buffer[index_send_buffer_read];
+		index_send_buffer_read = (index_send_buffer_read + 1) % MAX_SEND_BUFFER;
+		size_send_buffer--;
+	}else
+		terminado = 1;
+}*/
 
 /*
  * Realiza una copia del string de entrada y manda el
@@ -116,19 +144,3 @@ void enviar_string(char *string) {
 		size_send_buffer--;
 	}
 }*/
-
-void enviar_string(char *string) {
-	index_send_buffer = 0;
-	size_send_buffer = 0;
-	terminado = 0;
-	
-	//Copiar el string a mi 'send_buffer' y controlar que no nos salgamos del limite
-	while (string[size_send_buffer] != '\0' && size_send_buffer < MAX_SEND_BUFFER) {
-		send_buffer[size_send_buffer] = string[size_send_buffer];
-		size_send_buffer++;
-	}
-
-	U0THR = send_buffer[index_send_buffer]; 							//manda el primer caracter a la UART0
-	index_send_buffer++;
-}
-
