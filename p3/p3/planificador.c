@@ -18,6 +18,8 @@ void planificador_main(void) {
 	GPIO_marcar_salida(0,14);
 	ga_inicializar();
 	gIO_inicializar();
+	init_serial_byInterrupt(); 
+	actualizar_uart();
 	gp_inicializar();
 	ge_inicializar();
 		WD_feed();

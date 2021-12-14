@@ -67,6 +67,10 @@ static int esPista(CELDA celda){
 	return celda & 0x0010;
 }
 
+static int esError(CELDA celda){
+	return celda & 0x0020;
+}
+
 static int celda_noEsCandidato(CELDA celda, uint8_t valor){
 	int mask = 1 << (6 + valor);
 	mask = mask & celda;

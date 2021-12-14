@@ -9,8 +9,8 @@
 ;/*****************************************************************************/
 
 T_Bit           EQU     0x20
-ENMASK			EQU		0x18020
-FIQMASK			EQU		0x18030
+ENMASK			EQU		0x18060
+FIQMASK			EQU		0x18070
 VICIntEnable	EQU		0xFFFFF010
 VICIntEnClr		EQU		0xFFFFF014
 	

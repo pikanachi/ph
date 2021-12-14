@@ -3,8 +3,11 @@
 #include "Serial_port.h"
 
 #define CR     		0x0D
-#define MAX_SEND_BUFFER 	10
+#define MAX_SEND_BUFFER 	1000
 #define MAX_REC_BUFFER 	10
+
+static unsigned int estado = ESPERA_CMD;
+static unsigned int csum = 0;
 
 char frase[10];
 
@@ -16,6 +19,131 @@ static uint8_t terminado = 0;
 
 static char rec_buffer[MAX_REC_BUFFER];
 static uint8_t index_rec_buffer = 0;
+
+void actualizar_estado(char c){
+	switch(estado){
+		case ESPERA_CMD:
+			if(c == '#'){
+				estado = ESPERA_NRNUM;
+				U0THR = c;
+				index_rec_buffer++;
+			} else {
+				index_rec_buffer = 0;
+				estado = ESPERA_CMD;
+				enviar_string("\nbadCMD\n");
+			}
+			break;
+		case ESPERA_NRNUM:
+			if(c == 'N'){
+				estado = ESPERA_E;
+				U0THR = c;
+				index_rec_buffer++;
+			} else if(c == 'R') {
+				estado = ESPERA_S;
+				U0THR = c;
+				index_rec_buffer++;
+			} else if(c >= '0' && c <= '9'){
+				csum = csum + c - '0';
+				estado = ESPERA_COL;
+				U0THR = c;
+				index_rec_buffer++;
+			} else{
+				index_rec_buffer = 0;
+				estado = ESPERA_CMD;
+				enviar_string("\nbadCMD\n");
+			}
+			break;
+		case ESPERA_S:
+			if(c == 'S'){
+				estado = ESPERA_T;
+				U0THR = c;
+				index_rec_buffer++;
+			} else {
+				index_rec_buffer = 0;
+				estado = ESPERA_CMD;
+				enviar_string("\nbadCMD\n");
+			}
+			break;
+		case ESPERA_T:
+			if(c == 'T'){
+				estado = ESPERA_EXC;
+				U0THR = c;
+				index_rec_buffer++;
+			} else {
+				index_rec_buffer = 0;
+				estado = ESPERA_CMD;
+				enviar_string("\nbadCMD\n");
+			}
+			break;
+		case ESPERA_E:
+			if(c == 'E'){
+				estado = ESPERA_W;
+				U0THR = c;
+				index_rec_buffer++;
+			} else {
+				index_rec_buffer = 0;
+				estado = ESPERA_CMD;
+				enviar_string("\nbadCMD\n");
+			}
+			break;
+		case ESPERA_W:
+			if(c == 'W'){
+				estado = ESPERA_EXC;
+				U0THR = c;
+				index_rec_buffer++;
+			} else {
+				index_rec_buffer = 0;
+				estado = ESPERA_CMD;
+				enviar_string("\nbadCMD\n");
+			}
+			break;
+		case ESPERA_COL:
+			if(c >= '0' && c <= '9'){
+				csum = csum + c - '0';
+				estado = ESPERA_VAL;
+				U0THR = c;
+				index_rec_buffer++;
+			} else {
+				index_rec_buffer = 0;
+				estado = ESPERA_CMD;
+				enviar_string("\nbadCMD\n");
+			}
+			break;
+		case ESPERA_VAL:
+			if(c >= '0' && c <= '9'){
+				csum = csum + c - '0';
+				estado = ESPERA_CHECK;
+				U0THR = c;
+				index_rec_buffer++;
+			} else {
+				index_rec_buffer = 0;
+				estado = ESPERA_CMD;
+				enviar_string("\nbadCMD\n");
+			}
+			break;
+		case ESPERA_CHECK:
+			if((csum%8) == (c - '0')){
+				estado = ESPERA_EXC;
+				U0THR = c;
+				index_rec_buffer++;
+				csum = 0;
+			} else{
+				index_rec_buffer = 0;
+				estado = ESPERA_CMD;
+				enviar_string("\nbadCMD\n");
+			}
+			break;
+		case ESPERA_EXC:
+			if(c == '!'){
+				U0THR = c;
+				enviar_string("\ngudCMD\n");
+			} else{
+				enviar_string("\nbadCMD\n");
+			}
+			estado = ESPERA_CMD;
+			break;
+	}
+}
 
 void continuar_msj(void){
 	if (index_send_buffer < size_send_buffer){						// Mirar si hemos llagado al final del mensaje
@@ -46,6 +174,7 @@ void serial_ISR (void) __irq {
 	if (mask == 0x4) {																														
 		if (index_rec_buffer < MAX_REC_BUFFER) {							// Appendear mensaje al buffer si cabe para no irnos de vacas por la memoria
 			rec_buffer[index_rec_buffer] = U0RBR;								// Receiver send_buffer RBR Register (nos da el caracter introducido en la UART)
+			actualizar_estado(rec_buffer[index_rec_buffer]);	
 			if (rec_buffer[index_rec_buffer] == '!') {					// Fin del mensaje
 				//hacer lo que sea que diga la accion
 				if (strcmp(rec_buffer, "#RST!") == 0) {
@@ -57,11 +186,9 @@ void serial_ISR (void) __irq {
 				} else if (strcmp(rec_buffer, "#FCVS!") == 0) {
 					// Jugada
 					strcpy(frase, "jugada");
-				}
-				index_rec_buffer = 0;															// Reiniciar el buffer para leer otro mensaje
-			} else {
-				index_rec_buffer++;
-			}
+				}	
+			index_rec_buffer = 0;				// Reiniciar el buffer para leer otro mensaje
+			} 
 		} else {	
 			index_rec_buffer = 0;																// Hemos llenado el buffer, resetear
 		}	
@@ -144,3 +271,5 @@ void enviar_string(char *string) {
 		size_send_buffer--;
 	}
 }*/
+
+
