@@ -83,6 +83,7 @@ __enable_isr
                 MSR     SPSR_cxsf, R12         ; Set SPSR
                 LDMFD   SP!, {R12, PC}^        ; Restore R12 and Return
 __disable_isr
+				PUSH	{r4}
 				LDR		r0,=VICIntEnClr			;r0 = @ VICIntEnClr
 				LDR 	r1,=ENMASK	
 				LDR		r4,=VICIntEnable
@@ -90,6 +91,7 @@ __disable_isr
 				LDR		r3,=LASTVIC
 				str		r2,[r3]
 				str		r1,[r0]					;como solo se escriben los 1 en VICIntEnClr, se escribe un 1 en VICIntEnClr de las IRQ que usamos
+				POP		{r4}
 				LDMFD   SP!, {R8, R12}         ; Load R8, SPSR
                 MSR     SPSR_cxsf, R12         ; Set SPSR
                 LDMFD   SP!, {R12, PC}^        ; Restore R12 and Return
@@ -103,6 +105,7 @@ __enable_isr_fiq
                 MSR     SPSR_cxsf, R12         ; Set SPSR
                 LDMFD   SP!, {R12, PC}^        ; Restore R12 and Return
 __disable_isr_fiq
+				PUSH	{r4}
 				LDR		r0,=VICIntEnClr			;r0 = @ VICIntEnClr
 				LDR		r4,=VICIntEnable
 				LDR 	r1,=FIQMASK	
@@ -110,6 +113,7 @@ __disable_isr_fiq
 				LDR		r3,=LASTVIC
 				str		r2,[r3]
 				str		r1,[r0]					;como solo se escriben los 1 en VICIntEnClr, se escribe un 1 en VICIntEnClr de las IRQ que usamos
+				POP		{r4}
 				LDMFD   SP!, {R8, R12}         ; Load R8, SPSR
                 MSR     SPSR_cxsf, R12         ; Set SPSR
                 LDMFD   SP!, {R12, PC}^        ; Restore R12 and Return

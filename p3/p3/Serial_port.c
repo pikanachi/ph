@@ -10,17 +10,20 @@ static unsigned int estado = ESPERA_CMD;
 static unsigned int csum = 0;
 static unsigned int fila = 0;
 static unsigned int columna = 0;
+static unsigned int valor = 0;
+static uint8_t jugada = 0;
 
 char frase[10];
 
 // send_buffer
 static char send_buffer[MAX_SEND_BUFFER];
-static uint8_t index_send_buffer = 0;
+static int index_send_buffer = 0;
 static int size_send_buffer = 0;
 static uint8_t terminado = 0;
 
 static char rec_buffer[MAX_REC_BUFFER];
 static uint8_t index_rec_buffer = 0;
+static char msg[MAX_SEND_BUFFER];
 
 void actualizar_estado(char c){
 	switch(estado){
@@ -29,22 +32,10 @@ void actualizar_estado(char c){
 				estado = ESPERA_NRNUM;
 				U0THR = c;
 				index_rec_buffer++;
-			} else if(c == 'i' || c == 'I'){
-				fila = (fila - 1)%8;
-			} 
-			else if(c == 'j' || c == 'J'){
-				columna = (columna - 1)%8;
-			} 
-			else if(c == 'k' || c == 'K'){
-				fila = (fila + 1)%8;
-			} 
-			else if(c == 'l' || c == 'L'){
-				columna = (columna + 1)%8;
-			} 
-			else {
+			} else {
 				index_rec_buffer = 0;
 				estado = ESPERA_CMD;
-				enviar_string("\nbadCMD\n");
+				enviar_string("\nbadCMD\nIntroduce tu comando-->\0");
 			}
 			break;
 		case ESPERA_NRNUM:
@@ -56,15 +47,16 @@ void actualizar_estado(char c){
 				estado = ESPERA_S;
 				U0THR = c;
 				index_rec_buffer++;
-			} else if(c >= '0' && c <= '9'){
+			} else if(c >= '1' && c <= '9'){
 				csum = csum + c - '0';
 				estado = ESPERA_COL;
+				fila = c - '1';
 				U0THR = c;
 				index_rec_buffer++;
 			} else{
 				index_rec_buffer = 0;
 				estado = ESPERA_CMD;
-				enviar_string("\nbadCMD\n");
+				enviar_string("\nbadCMD\nIntroduce tu comando-->\0");
 			}
 			break;
 		case ESPERA_S:
@@ -75,7 +67,7 @@ void actualizar_estado(char c){
 			} else {
 				index_rec_buffer = 0;
 				estado = ESPERA_CMD;
-				enviar_string("\nbadCMD\n");
+				enviar_string("\nbadCMD\nIntroduce tu comando-->\0");
 			}
 			break;
 		case ESPERA_T:
@@ -86,7 +78,7 @@ void actualizar_estado(char c){
 			} else {
 				index_rec_buffer = 0;
 				estado = ESPERA_CMD;
-				enviar_string("\nbadCMD\n");
+				enviar_string("\nbadCMD\nIntroduce tu comando-->\0");
 			}
 			break;
 		case ESPERA_E:
@@ -97,7 +89,7 @@ void actualizar_estado(char c){
 			} else {
 				index_rec_buffer = 0;
 				estado = ESPERA_CMD;
-				enviar_string("\nbadCMD\n");
+				enviar_string("\nbadCMD\nIntroduce tu comando-->\0");
 			}
 			break;
 		case ESPERA_W:
@@ -108,31 +100,37 @@ void actualizar_estado(char c){
 			} else {
 				index_rec_buffer = 0;
 				estado = ESPERA_CMD;
-				enviar_string("\nbadCMD\n");
+				enviar_string("\nbadCMD\nIntroduce tu comando-->\0");
 			}
 			break;
 		case ESPERA_COL:
-			if(c >= '0' && c <= '9'){
+			if(c >= '1' && c <= '9'){
 				csum = csum + c - '0';
-				estado = ESPERA_VAL;
+				estado = ESPERA_VAL_C;
+				columna = c - '1';
 				U0THR = c;
 				index_rec_buffer++;
 			} else {
 				index_rec_buffer = 0;
 				estado = ESPERA_CMD;
-				enviar_string("\nbadCMD\n");
+				enviar_string("\nbadCMD\nIntroduce tu comando-->\0");
 			}
 			break;
-		case ESPERA_VAL:
+		case ESPERA_VAL_C:
 			if(c >= '0' && c <= '9'){
 				csum = csum + c - '0';
 				estado = ESPERA_CHECK;
 				U0THR = c;
+				valor = c - '0';
+				index_rec_buffer++;
+			} else if(c == 'C'){
+				estado = ESPERA_EXC;
+				U0THR = c;
 				index_rec_buffer++;
 			} else {
 				index_rec_buffer = 0;
 				estado = ESPERA_CMD;
-				enviar_string("\nbadCMD\n");
+				enviar_string("\nbadCMD\nIntroduce tu comando-->\0");
 			}
 			break;
 		case ESPERA_CHECK:
@@ -144,26 +142,46 @@ void actualizar_estado(char c){
 			} else{
 				index_rec_buffer = 0;
 				estado = ESPERA_CMD;
-				enviar_string("\nbadCMD\n");
+				enviar_string("\nbadCHECKSUM\n");
 			}
 			break;
 		case ESPERA_EXC:
 			if(c == '!'){
 				U0THR = c;
-				enviar_string("\ngudCMD\n");
+				//enviar_string("\ngudCMD\n");
 			} else{
-				enviar_string("\nbadCMD\n");
+				enviar_string("\nbadCMD\nIntroduce tu comando-->\0");
 			}
 			estado = ESPERA_CMD;
+			csum = 0;
 			break;
 	}
 }
 
-void actualizar_uart(void){
+void cat(char *dest, char *catenado){
+	int i, a;
+	for(i = 0; dest[i]!= '\0';i++);
+	// dest[i] = '\0'
+	for(a = 0; catenado[a] != '\0'; a++){
+		dest[i] = catenado[a];
+		i++;
+	}
+	dest[i] = '\0';
+}
+
+void actualizar_uart(char *msgFinal){
 	int resta = 1;
-	char msg[MAX_SEND_BUFFER];
+	//char string[MAX_REC_BUFFER];
+	int f;
+	uint8_t valor;
+	char straux[3];
+	char aux;
 	int i, j;
-	strcpy(msg,"");
+	msg[0] = '\0';
+	msg[1] = 'L';
+	msg[2] = 'R';
+	msg[2] = '\0';
+	cat(msg,"\n");
 	for(i = 0; i < 19; i++){
 		if(i%2 == 0){//Delimitadores
 			/*
@@ -175,42 +193,41 @@ void actualizar_uart(void){
 					enviar_string(" - - +");
 				}
 			}
-			*/strcat(msg,"+ - - + - - + - - + - - + - - + - - + - - + - - + - - +\n");
+			*/cat(msg,"+ - - + - - + - - + - - + - - + - - + - - + - - + - - +\n");
 		} else{
-			int f;
-			uint8_t valor;
-			char string[MAX_SEND_BUFFER];
-			char straux[2];
-			char aux;
 			f = i - resta;
 			resta++;
 			for(j = 0; j < 9; j++){
 				if(j == 0){
-					strcat(string,"|");
+					strcat(msg,"|");
 				}
 				
 				valor = celda_leer_valor(cuadricula_C_C[f][j]);
-				aux = '0' + valor;
+				if(valor == 0){
+					aux = ' ';
+				} else{
+					aux = '0' + valor;
+				}
 				straux[0] = ' ';
 				straux[1] = aux;
-				strcat(string, straux);
+				straux[2] = '\0';
+				cat(msg, straux);
 				if (esPista(cuadricula_C_C[f][j])){
-					strcat(string, " P |");
+					strcat(msg, " P |");
 				} else if(esError(cuadricula_C_C[f][j])){
-					strcat(string, " E |");
+					strcat(msg, " E |");
 				} else{
-					strcat(string, "   |");
+					strcat(msg, "   |");
 				}
 				//enviar_string("+ V PE +");
 				if(j == 8){
-					strcat(msg, strcat(string, "\n"));
-				} else{
-					strcat(msg,string);
+					strcat(msg, "\n");
 				}
-				strcpy(string,"");
 			}
 		}
 	}
+	strcat(msg, msgFinal);
+	strcat(msg, "\0TERMINO AQUI");
 	enviar_string(msg);
 }
 
@@ -229,38 +246,115 @@ uint8_t ha_terminado(void){
 	return terminado;
 }
 
+void enviar_candidatos(void){
+	uint16_t candidatos;
+	char msg[50];
+	char aux[2];
+	int i;
+	int mask;
+	int cand;
+	if(!esPista(cuadricula_C_C[fila][columna])){
+		strcpy(msg,"\nCandidatos en fila ");
+		aux[0] = '0' + fila;
+		aux[1] = '\0';
+		strcat(msg, aux);
+		strcat(msg, " y columna ");
+		aux[0] = '0' + columna;
+		aux[1] = '\0';
+		strcat(msg, aux);
+		strcat(msg, ": ");
+		candidatos = celda_leer_candidatos(cuadricula_C_C[fila][columna]);
+		mask = 1;
+		for(i = 1; i <= 9; i++){
+			cand = candidatos & mask;
+			if(cand  == 0){
+				aux[0] = '0' + i;
+				aux[1] = '\0';
+				strcat(msg, aux);
+				strcat(msg, " ");
+			}
+			mask = mask * 2;
+		}
+		strcat(msg, "\n");
+	} else{
+		strcpy(msg, "\nLa celda seleccionada es una pista\n");
+	}
+	strcat(msg,"Introduce tu comando-->\0");
+	enviar_string(msg);
+}
+
+void introducir_jugada(void){
+	//int tiempo;
+	char msg2[100];
+	if(esPista(cuadricula_C_C[fila][columna])){
+		strcpy(msg2, "\nLa celda en la que quieres introducir valor es una pista\n");
+			enviar_string(msg2);
+	} else{
+		celda_poner_valor(&cuadricula_C_C[fila][columna], valor);
+				checkError(&cuadricula_C_C[fila][columna]);
+		candidatos_actualizar_c(cuadricula_C_C);
+		jugada = 1;
+		actualizar_uart("¿Confirmar jugada?\n\0");
+		set_Alarma(No_Confir_Jugada,3000,0);
+		set_Alarma(Latido_Validacion,100,1);
+	}
+}
+
+void acaba_jugada(void){
+	jugada = 0;
+	set_Alarma(Latido_Validacion,0,0);
+}
+
+void cancelar_jugada(void){
+	celda_poner_valor(&cuadricula_C_C[fila][columna], 0);
+	checkError(&cuadricula_C_C[fila][columna]);
+	candidatos_actualizar_c(cuadricula_C_C);
+	actualizar_uart("Jugada cancelada\nIntroduce tu comando-->\0");
+	jugada = 0;
+	set_Alarma(Latido_Validacion,0,0);
+}
+
 /*
  * RSI de la UART0 
  */
 void serial_ISR (void) __irq {
 	int mask;
+	int retardo;
 	VICVectAddr = 0;
 	
 	mask = 0xE; 																						// Nos quedamos con los bits 3:1 que nos dicen que tipo de interr ha sido
 	mask &= U0IIR; 																			 		// Interrupt ID register (if read clears the interrupt)
 	
 	// Recibo datos de UART0 (3:1 = 010) (pg 88)
-	if (mask == 0x4) {																														
-		if (index_rec_buffer < MAX_REC_BUFFER) {							// Appendear mensaje al buffer si cabe para no irnos de vacas por la memoria
-			rec_buffer[index_rec_buffer] = U0RBR;								// Receiver send_buffer RBR Register (nos da el caracter introducido en la UART)
-			actualizar_estado(rec_buffer[index_rec_buffer]);	
-			if (rec_buffer[index_rec_buffer] == '!') {					// Fin del mensaje
-				//hacer lo que sea que diga la accion
-				if (strcmp(rec_buffer, "#RST!") == 0) {
-					// Terminar partida
-					strcpy(frase, "terminar");
-				} else if (strcmp(rec_buffer, "#NEW!") == 0) {
-					// Nueva partida
-					strcpy(frase, "nueva");
-				} else if (strcmp(rec_buffer, "#FCVS!") == 0) {
-					// Jugada
-					strcpy(frase, "jugada");
-				}	
-			index_rec_buffer = 0;				// Reiniciar el buffer para leer otro mensaje
-			} 
-		} else {	
-			index_rec_buffer = 0;																// Hemos llenado el buffer, resetear
-		}	
+	if (mask == 0x4) {
+		if(ha_terminado() && jugada == 0){
+			if (index_rec_buffer < MAX_REC_BUFFER) {							// Appendear mensaje al buffer si cabe para no irnos de vacas por la memoria
+				rec_buffer[index_rec_buffer] = U0RBR;								// Receiver send_buffer RBR Register (nos da el caracter introducido en la UART)
+				actualizar_estado(rec_buffer[index_rec_buffer]);	
+				if (rec_buffer[index_rec_buffer] == '!') {					// Fin del mensaje
+					//hacer lo que sea que diga la accion
+					if (strcmp(rec_buffer, "#RST!") == 0) {
+						// Terminar partida
+						strcpy(frase, "terminar");
+					} else if (strcmp(rec_buffer, "#NEW!") == 0) {
+						// Nueva partida
+						strcpy(frase, "nueva");
+					} else if (rec_buffer[index_rec_buffer - 1] >= '0' && rec_buffer[index_rec_buffer - 1] <= '9' && rec_buffer[index_rec_buffer - 2] >= '0' && rec_buffer[index_rec_buffer - 2] <= '9'  && rec_buffer[index_rec_buffer - 3] >= '0' && rec_buffer[index_rec_buffer - 3] <= '9' && rec_buffer[index_rec_buffer - 4] >= '0' && rec_buffer[index_rec_buffer - 4] <= '9') {
+						introducir_jugada();
+					}	else if (rec_buffer[index_rec_buffer - 1] == 'C' && rec_buffer[index_rec_buffer - 2] >= '0' && rec_buffer[index_rec_buffer - 2] <= '9'  && rec_buffer[index_rec_buffer - 3] >= '0' && rec_buffer[index_rec_buffer - 3] <= '9') {
+						enviar_candidatos();
+					}	
+					rec_buffer[index_rec_buffer] = '.';
+					index_rec_buffer = 0;				// Reiniciar el buffer para leer otro mensaje
+				} 
+			} else {	
+				index_rec_buffer = 0;																// Hemos llenado el buffer, resetear
+			}
+		} else{
+			char aux;
+			aux = U0RBR;								// Receiver send_buffer RBR Register (nos da el caracter introducido en la UART)
+			continuar_msj();
+		}
 	} 
 	// Escribo datos en UART0 (3:1 = 010) (pg 88)
 	else if (mask == 0x2) { 	
@@ -269,13 +363,15 @@ void serial_ISR (void) __irq {
 			// Mandar al planificador evento para que continue el planificador
 		}
 	}
+	retardo = TIME_PWDN & 0x007FFFFF;     						// Asegurarnos que el retardo es de 23bits
+	set_Alarma(Power_Down, retardo, 1);
 }
 
 /*
  * Inicializa las interrupciones de la UART0
  */
 void init_serial_byInterrupt (void)  {        // Initialize Serial Interface	
-  PINSEL0 = 0x5;             									// Enable RxD1 and TxD1
+  PINSEL0 = PINSEL0 | 0x5;             									// Enable RxD1 and TxD1
   U0LCR = 0x83;                          			// 8 bits, no Parity, 1 Stop bit
   U0DLL = 97;                            			// Divisor Latch LSB 9600 Baud Rate @ 15MHz VPB Clock
   U0LCR = 0x03;                          			// Line Control Register DLAB = 0
@@ -285,6 +381,7 @@ void init_serial_byInterrupt (void)  {        // Initialize Serial Interface
 	VICVectAddr5 = (unsigned long)serial_ISR;
 	VICVectCntl5 = 0x20 | 6;
 	U0IER = U0IER | 0x3;												// Interrupt Enable Register, habilitar las RBR (Receiver send_buffer Register) y las THR (Transmit Holding Register)
+	candidatos_actualizar_c(cuadricula_C_C);
 }
 
 void enviar_string(char *string) {

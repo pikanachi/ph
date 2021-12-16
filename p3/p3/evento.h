@@ -38,7 +38,9 @@ enum {
     Apagar_Validacion = 8,
     Terminar = 9,
     Check_Pulsacion_Terminar = 10,
-		Latido = 11
+		Latido = 11,
+		No_Confir_Jugada = 12,
+		Latido_Validacion = 13
 };
 
 /*

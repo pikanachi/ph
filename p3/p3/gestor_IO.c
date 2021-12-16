@@ -213,3 +213,8 @@ void gIO_alternar_latido(void){
 	int l31 = GPIO_leer(31,1);
 	GPIO_escribir(31,1,(l31+1)%2);
 }
+
+void gIO_alternar_validacion(void){
+	int l31 = GPIO_leer(13,1);
+	GPIO_escribir(13,1,(l31+1)%2);
+}

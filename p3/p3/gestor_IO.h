@@ -82,6 +82,12 @@ void gIO_apagar_latido(void);
 void gIO_alternar_latido(void);
 
 /*
+ * Alterna el latido del GPIO encendiendo el bit 31 
+ * si estaba apagado y apagandolo si estaba encendido
+ */
+void gIO_alternar_validacion(void);
+
+/*
  * Apaga el led de validación (bit 13 GPIO)
  */
 void gIO_apagar_validacion(void);

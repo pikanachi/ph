@@ -76,4 +76,21 @@ static int celda_noEsCandidato(CELDA celda, uint8_t valor){
 	mask = mask & celda;
 	return mask >> (6 + valor);
 }
+
+static void checkError(CELDA *celda){
+	int mask = 0x7;
+	int valor = mask & *celda;
+	if(valor == 0){
+		mask = 1 << 5;
+		mask = ~mask;
+		*celda = *celda & mask;
+	} else{
+		mask = 1 <<(6 + valor);
+		mask = mask & *celda;
+		mask = mask >> (6 + valor);
+		mask = mask << 5;
+		*celda = *celda | mask;
+	}
+	
+}
 #endif // CELDA_H

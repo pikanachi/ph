@@ -88,7 +88,7 @@ uint8_t actualizar_alarma(Alarma al) {
     for (i = 0; i < NUM_EVENTOS; i++) {
         //Si es válida, coincide el id y es periódica
         if (alarmasPendientes[i].esValida == 1 && alarmasPendientes[i].IDevento == al.IDevento 
-            && alarmasPendientes[i].esPeriodica) {
+            ) {
             //Cancelar alarma
             if (al.periodo == 0) {
                 alarmasPendientes[i].esValida = 0;

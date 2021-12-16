@@ -18,11 +18,11 @@ void planificador_main(void) {
 	GPIO_marcar_salida(0,14);
 	ga_inicializar();
 	gIO_inicializar();
-	init_serial_byInterrupt(); 
-	actualizar_uart();
 	gp_inicializar();
 	ge_inicializar();
-		WD_feed();
+	//WD_feed();
+		init_serial_byInterrupt(); 
+	actualizar_uart("Introduce tu comando-->\0");
 
 	while(1) {
 		if(gIO_leer_overflow()){
@@ -54,7 +54,11 @@ void planificador_main(void) {
 						break;
 					case Pulsacion_EINT1 :
 						//Se comprueba si sigue pulsada EINT1
-						gIO_escribir_entrada();
+						//gIO_escribir_entrada();
+						//CONFIRMAR ENTRADA (Cancelar la alarma de No_Confir_Entrada)
+						set_Alarma(No_Confir_Jugada,0,0);
+						acaba_jugada();
+						enviar_string("Jugada confirmada\nIntroduce comando-->\0");
 						break;
 					case Pulsacion_EINT2 :
 						//Borrar dato seleccionado de la celda
@@ -104,6 +108,12 @@ void planificador_main(void) {
 						break;
 					case Latido:
 						gIO_alternar_latido();
+						break;
+					case No_Confir_Jugada:
+						cancelar_jugada();
+						break;
+					case Latido_Validacion:
+						gIO_alternar_validacion();
 				}
 			}
 		} else { // Cola vacia

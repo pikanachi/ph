@@ -15,8 +15,8 @@ enum {
 	ESPERA_E = 5,
 	ESPERA_W = 6,
 	ESPERA_COL = 7,
-	ESPERA_VAL = 8,
-	ESPERA_CHECK = 9
+	ESPERA_VAL_C = 8,
+	ESPERA_CHECK = 9,
 };
 
 void init_serial (void);
@@ -25,6 +25,7 @@ int getchar (void);
 void init_serial_byInterrupt(void);
 void enviar_string(char *string);
 uint8_t ha_terminado(void);
-void actualizar_uart(void);
-
+void actualizar_uart(char *msgFinal);
+void cancelar_jugada(void);
+void acaba_jugada(void);
 #endif
