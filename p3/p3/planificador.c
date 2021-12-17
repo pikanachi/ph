@@ -7,6 +7,7 @@
 
 
 void planificador_main(void) {
+	int fil, col;
 	//Empezar la cola de eventos
 	cola_crear_vacia();
 	RTC_init();
@@ -21,7 +22,7 @@ void planificador_main(void) {
 	gp_inicializar();
 	ge_inicializar();
 	//WD_feed();
-		init_serial_byInterrupt(); 
+	init_serial_byInterrupt(); 
 	actualizar_uart("Introduce tu comando-->\0");
 
 	while(1) {
@@ -118,6 +119,21 @@ void planificador_main(void) {
 						break;
 					case Latido_Validacion:
 						gIO_alternar_validacion();
+						break;
+					//NEW-----
+					case Candidatos:
+						col = evento.auxData & 0xFF;
+						fil = evento.auxData >> 8;
+						uart_enviar_candidatos(fil - 1, col - 1);
+						break; 
+					/*
+					//Cambiar el .h y .c para que acepte parametros si descomento <-----IMPORTANT!!!!
+					case Jugada:
+						col = evento.auxData & 0xFF;
+						fil = evento.auxData >> 8;
+						uart_introducir_jugada(fil - 1, col - 1);
+						break; 
+					*/
 				}
 			}
 		} else { // Cola vacia

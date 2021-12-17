@@ -7,7 +7,6 @@
 #define MAX_REC_BUFFER 	10
 
 static unsigned int estado = ESPERA_CMD;
-static unsigned int csum = 0;
 static unsigned int fila = 0;
 static unsigned int columna = 0;
 static unsigned int valor = 0;
@@ -26,37 +25,39 @@ static uint8_t index_rec_buffer = 0;
 static char msg[MAX_SEND_BUFFER];
 
 void actualizar_estado(char c){
+	static int csum = 0;
 	switch(estado){
 		case ESPERA_CMD:
 			if(c == '#'){
+				//ressetear buffers
+				memset(&rec_buffer[0], 0, sizeof(rec_buffer)); 	//Wipe previous buffer
+				index_rec_buffer = 0;
+				csum = 0;
+				
 				estado = ESPERA_NRNUM;
 				U0THR = c;
 				index_rec_buffer++;
 			} else {
-				index_rec_buffer = 0;
 				estado = ESPERA_CMD;
-				enviar_string("\nbadCMD\nIntroduce tu comando-->\0");
+				enviar_string("\nInstruccion no reconocida\nIntroduce tu comando-->\0");
 			}
 			break;
 		case ESPERA_NRNUM:
-			if(c == 'N'){
-				estado = ESPERA_E;
+			if(c == 'N' || c == 'R' || (c >= '1' && c <= '9')){
 				U0THR = c;
 				index_rec_buffer++;
-			} else if(c == 'R') {
-				estado = ESPERA_S;
-				U0THR = c;
-				index_rec_buffer++;
-			} else if(c >= '1' && c <= '9'){
-				csum = csum + c - '0';
-				estado = ESPERA_COL;
-				fila = c - '1';
-				U0THR = c;
-				index_rec_buffer++;
+				if(c == 'N'){
+					estado = ESPERA_E;
+				} else if(c == 'R') {
+					estado = ESPERA_S;
+				} else {
+					csum += c - '0';
+					estado = ESPERA_COL;
+					fila = c - '1';
+				}
 			} else{
-				index_rec_buffer = 0;
 				estado = ESPERA_CMD;
-				enviar_string("\nbadCMD\nIntroduce tu comando-->\0");
+				enviar_string("\nInstruccion no reconocida\nIntroduce tu comando-->\0");
 			}
 			break;
 		case ESPERA_S:
@@ -65,9 +66,8 @@ void actualizar_estado(char c){
 				U0THR = c;
 				index_rec_buffer++;
 			} else {
-				index_rec_buffer = 0;
 				estado = ESPERA_CMD;
-				enviar_string("\nbadCMD\nIntroduce tu comando-->\0");
+				enviar_string("\nInstruccion no reconocida\nIntroduce tu comando-->\0");
 			}
 			break;
 		case ESPERA_T:
@@ -76,9 +76,8 @@ void actualizar_estado(char c){
 				U0THR = c;
 				index_rec_buffer++;
 			} else {
-				index_rec_buffer = 0;
 				estado = ESPERA_CMD;
-				enviar_string("\nbadCMD\nIntroduce tu comando-->\0");
+				enviar_string("\nInstruccion no reconocida\nIntroduce tu comando-->\0");
 			}
 			break;
 		case ESPERA_E:
@@ -87,9 +86,8 @@ void actualizar_estado(char c){
 				U0THR = c;
 				index_rec_buffer++;
 			} else {
-				index_rec_buffer = 0;
 				estado = ESPERA_CMD;
-				enviar_string("\nbadCMD\nIntroduce tu comando-->\0");
+				enviar_string("\nInstruccion no reconocida\nIntroduce tu comando-->\0");
 			}
 			break;
 		case ESPERA_W:
@@ -98,39 +96,36 @@ void actualizar_estado(char c){
 				U0THR = c;
 				index_rec_buffer++;
 			} else {
-				index_rec_buffer = 0;
 				estado = ESPERA_CMD;
-				enviar_string("\nbadCMD\nIntroduce tu comando-->\0");
+				enviar_string("\nInstruccion no reconocida\nIntroduce tu comando-->\0");
 			}
 			break;
 		case ESPERA_COL:
 			if(c >= '1' && c <= '9'){
-				csum = csum + c - '0';
+				csum += c - '0';
 				estado = ESPERA_VAL_C;
 				columna = c - '1';
 				U0THR = c;
 				index_rec_buffer++;
 			} else {
-				index_rec_buffer = 0;
 				estado = ESPERA_CMD;
-				enviar_string("\nbadCMD\nIntroduce tu comando-->\0");
+				enviar_string("\nInstruccion no reconocida\nIntroduce tu comando-->\0");
 			}
 			break;
 		case ESPERA_VAL_C:
-			if(c >= '0' && c <= '9'){
-				csum = csum + c - '0';
-				estado = ESPERA_CHECK;
-				U0THR = c;
-				valor = c - '0';
-				index_rec_buffer++;
-			} else if(c == 'C'){
-				estado = ESPERA_EXC;
+			if ((c >= '0' && c <= '9') || (c == 'C')) {
 				U0THR = c;
 				index_rec_buffer++;
+				if(c == 'C'){
+					estado = ESPERA_EXC;
+				} else {
+					csum += c - '0';
+					estado = ESPERA_CHECK;
+					valor = c - '0';
+				}
 			} else {
-				index_rec_buffer = 0;
 				estado = ESPERA_CMD;
-				enviar_string("\nbadCMD\nIntroduce tu comando-->\0");
+				enviar_string("\nInstruccion no reconocida\nIntroduce tu comando-->\0");
 			}
 			break;
 		case ESPERA_CHECK:
@@ -138,11 +133,9 @@ void actualizar_estado(char c){
 				estado = ESPERA_EXC;
 				U0THR = c;
 				index_rec_buffer++;
-				csum = 0;
 			} else{
-				index_rec_buffer = 0;
 				estado = ESPERA_CMD;
-				enviar_string("\nbadCHECKSUM\n");
+				enviar_string("\nChecksum incorrecta\n");
 			}
 			break;
 		case ESPERA_EXC:
@@ -150,10 +143,9 @@ void actualizar_estado(char c){
 				U0THR = c;
 				//enviar_string("\ngudCMD\n");
 			} else{
-				enviar_string("\nbadCMD\nIntroduce tu comando-->\0");
+				enviar_string("\nInstruccion no reconocida\nIntroduce tu comando-->\0");
 			}
 			estado = ESPERA_CMD;
-			csum = 0;
 			break;
 	}
 }
@@ -246,24 +238,27 @@ uint8_t ha_terminado(void){
 	return terminado;
 }
 
-void enviar_candidatos(void){
+/*
+ * 
+ */
+void uart_enviar_candidatos(int fil, int col){
 	uint16_t candidatos;
 	char msg[50];
 	char aux[2];
 	int i;
 	int mask;
 	int cand;
-	if(!esPista(cuadricula_C_C[fila][columna])){
+	if(!esPista(cuadricula_C_C[fil][col])){
 		strcpy(msg,"\nCandidatos en fila ");
-		aux[0] = '0' + fila;
+		aux[0] = '0' + fila + 1;
 		aux[1] = '\0';
 		strcat(msg, aux);
 		strcat(msg, " y columna ");
-		aux[0] = '0' + columna;
+		aux[0] = '0' + columna + 1;
 		aux[1] = '\0';
 		strcat(msg, aux);
 		strcat(msg, ": ");
-		candidatos = celda_leer_candidatos(cuadricula_C_C[fila][columna]);
+		candidatos = celda_leer_candidatos(cuadricula_C_C[fil][col]);
 		mask = 1;
 		for(i = 1; i <= 9; i++){
 			cand = candidatos & mask;
@@ -283,7 +278,7 @@ void enviar_candidatos(void){
 	enviar_string(msg);
 }
 
-void introducir_jugada(void){
+void uart_introducir_jugada(){
 	//int tiempo;
 	char msg2[100];
 	if(esPista(cuadricula_C_C[fila][columna])){
@@ -322,10 +317,10 @@ void serial_ISR (void) __irq {
 	int retardo;
 	VICVectAddr = 0;
 	
-	mask = 0xE; 																						// Nos quedamos con los bits 3:1 que nos dicen que tipo de interr ha sido
-	mask &= U0IIR; 																			 		// Interrupt ID register (if read clears the interrupt)
+	mask = 0xE; 																							// Nos quedamos con los bits 3:1 que nos dicen que tipo de interr ha sido
+	mask &= U0IIR; 																			 			// Interrupt ID register (if read clears the interrupt)
 	
-	// Recibo datos de UART0 (3:1 = 010) (pg 88)
+	// Recibo datos de UART0 (3:1 = 010) (man pg 88)
 	if (mask == 0x4) {
 		if(ha_terminado() && jugada == 0){
 			if (index_rec_buffer < MAX_REC_BUFFER) {							// Appendear mensaje al buffer si cabe para no irnos de vacas por la memoria
@@ -340,19 +335,42 @@ void serial_ISR (void) __irq {
 						// Nueva partida
 						strcpy(frase, "nueva");
 					} else if (rec_buffer[index_rec_buffer - 1] >= '0' && rec_buffer[index_rec_buffer - 1] <= '9' && rec_buffer[index_rec_buffer - 2] >= '0' && rec_buffer[index_rec_buffer - 2] <= '9'  && rec_buffer[index_rec_buffer - 3] >= '0' && rec_buffer[index_rec_buffer - 3] <= '9' && rec_buffer[index_rec_buffer - 4] >= '0' && rec_buffer[index_rec_buffer - 4] <= '9') {
-						introducir_jugada();
+						uart_introducir_jugada();
+					/*
+						Evento jugada;
+						jugada.ID_evento = Jugada;
+						jugada.auxData = rec_buffer[index_rec_buffer - 3] - '0'; //Fila
+						jugada.auxData <<= 8;
+					  jugada.auxData |= rec_buffer[index_rec_buffer - 2] - '0'; //Columna
+						disable_isr_fiq();
+						cola_guardar_evento(jugada);
+						enable_isr_fiq();
+					
+					*/
 					}	else if (rec_buffer[index_rec_buffer - 1] == 'C' && rec_buffer[index_rec_buffer - 2] >= '0' && rec_buffer[index_rec_buffer - 2] <= '9'  && rec_buffer[index_rec_buffer - 3] >= '0' && rec_buffer[index_rec_buffer - 3] <= '9') {
-						enviar_candidatos();
+						//uart_enviar_candidatos();
+						//------------------------------------------------------------------
+						Evento candidatos;
+						candidatos.ID_evento = Candidatos;
+						candidatos.auxData = rec_buffer[index_rec_buffer - 3] - '0'; //Fila
+						candidatos.auxData <<= 8;
+					  candidatos.auxData |= rec_buffer[index_rec_buffer - 2] - '0'; //Columna
+						disable_isr_fiq();
+						cola_guardar_evento(candidatos);
+						enable_isr_fiq();
+						//-------------------------------------------------------------------
 					}	
-					rec_buffer[index_rec_buffer] = '.';
-					index_rec_buffer = 0;				// Reiniciar el buffer para leer otro mensaje
+					//rec_buffer[index_rec_buffer] = '.';
+					memset(&rec_buffer[0], 0, sizeof(rec_buffer)); 		//Clear buffer
+					index_rec_buffer = 0;															// Reiniciar el buffer para leer otro mensaje
 				} 
-			} else {	
+			} else {
+				memset(&rec_buffer[0], 0, sizeof(rec_buffer)); 			//Clear buffer
 				index_rec_buffer = 0;																// Hemos llenado el buffer, resetear
 			}
 		} else{
 			char aux;
-			aux = U0RBR;								// Receiver send_buffer RBR Register (nos da el caracter introducido en la UART)
+			aux = U0RBR;																					// Receiver send_buffer RBR Register (nos da el caracter introducido en la UART)
 			continuar_msj();
 		}
 	} 
@@ -363,7 +381,7 @@ void serial_ISR (void) __irq {
 			// Mandar al planificador evento para que continue el planificador
 		}
 	}
-	retardo = TIME_PWDN & 0x007FFFFF;     						// Asegurarnos que el retardo es de 23bits
+	retardo = TIME_PWDN & 0x007FFFFF;     			// Asegurarnos que el retardo es de 23bits
 	set_Alarma(Power_Down, retardo, 1);
 }
 
@@ -371,7 +389,7 @@ void serial_ISR (void) __irq {
  * Inicializa las interrupciones de la UART0
  */
 void init_serial_byInterrupt (void)  {        // Initialize Serial Interface	
-  PINSEL0 = PINSEL0 | 0x5;             									// Enable RxD1 and TxD1
+  PINSEL0 = PINSEL0 | 0x5;             				// Enable RxD1 and TxD1
   U0LCR = 0x83;                          			// 8 bits, no Parity, 1 Stop bit
   U0DLL = 97;                            			// Divisor Latch LSB 9600 Baud Rate @ 15MHz VPB Clock
   U0LCR = 0x03;                          			// Line Control Register DLAB = 0
@@ -385,6 +403,7 @@ void init_serial_byInterrupt (void)  {        // Initialize Serial Interface
 }
 
 void enviar_string(char *string) {
+	memset(&send_buffer[0], 0, sizeof(send_buffer)); 	//Wipe previous buffer
 	size_send_buffer = 0;
 	index_send_buffer = 0;
 	terminado = 0;

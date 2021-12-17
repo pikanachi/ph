@@ -163,7 +163,7 @@
           <SizeOfObject>0</SizeOfObject>
           <BreakByAccess>0</BreakByAccess>
           <BreakIfRCount>1</BreakIfRCount>
-          <Filename>\vmware-host\Shared Folders\Documentos\Informatica\s05\phard\ph\p3\UART0_test_Nacho\\vmware-host\Shared Folders\Documentos\Informatica\s05\phard\ph\p3\UART0_test_Nacho\main.c</Filename>
+          <Filename>\\vmware-host\Shared Folders\vmware-host\Shared Folders\Documentos\Informatica\s05\phard\ph\p3\UART0_test_Nacho\vmware-host\Shared Folders\Documentos\Informatica\s05\phard\ph\p3\UART0_test_Nacho\main.c</Filename>
           <ExecCommand></ExecCommand>
           <Expression></Expression>
         </Bp>
@@ -179,7 +179,7 @@
           <SizeOfObject>0</SizeOfObject>
           <BreakByAccess>0</BreakByAccess>
           <BreakIfRCount>1</BreakIfRCount>
-          <Filename>\vmware-host\Shared Folders\Documentos\Informatica\s05\phard\ph\p3\UART0_test_Nacho\\vmware-host\Shared Folders\Documentos\Informatica\s05\phard\ph\p3\UART0_test_Nacho\Serial_port.c</Filename>
+          <Filename>\\vmware-host\Shared Folders\vmware-host\Shared Folders\Documentos\Informatica\s05\phard\ph\p3\UART0_test_Nacho\vmware-host\Shared Folders\Documentos\Informatica\s05\phard\ph\p3\UART0_test_Nacho\Serial_port.c</Filename>
           <ExecCommand></ExecCommand>
           <Expression></Expression>
         </Bp>

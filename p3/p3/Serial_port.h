@@ -28,4 +28,6 @@ uint8_t ha_terminado(void);
 void actualizar_uart(char *msgFinal);
 void cancelar_jugada(void);
 void acaba_jugada(void);
+void uart_enviar_candidatos(int fil, int col);
+
 #endif

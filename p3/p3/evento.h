@@ -40,7 +40,9 @@ enum {
     Check_Pulsacion_Terminar = 10,
 		Latido = 11,
 		No_Confir_Jugada = 12,
-		Latido_Validacion = 13
+		Latido_Validacion = 13,
+		Candidatos = 14,
+		Jugada = 15
 };
 
 /*
