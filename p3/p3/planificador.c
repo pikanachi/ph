@@ -88,7 +88,9 @@ void planificador_main(void) {
 						eAlarma.auxData = eAlarma.auxData << 23;
 						eAlarma.auxData = eAlarma.auxData | retardo;
 						eAlarma.timestamp = temporizador_leer() / 1000;
+						disable_isr_fiq();
 						cola_guardar_evento(eAlarma); 
+						enable_isr_fiq();
 						break;
 					case Check_Pulsacion_Terminar:
 						//Poner al procesador en modo powerDown
@@ -101,7 +103,9 @@ void planificador_main(void) {
 							eAlarma.auxData = eAlarma.auxData << 23;
 							eAlarma.auxData = eAlarma.auxData | retardo;
 							eAlarma.timestamp = temporizador_leer() / 1000;
+							disable_isr_fiq();
 							cola_guardar_evento(eAlarma); 
+							enable_isr_fiq(); 
 							vaciar_cola();
 							ge_modo_pwdwn();
 						}

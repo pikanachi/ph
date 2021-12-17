@@ -30,8 +30,9 @@ void ga_comprobar_alarmas(void) {
         if (((clock_gettime() / 1000) >= alarmasPendientes[i].timeToLeave) && alarmasPendientes[i].esValida == 1) {
             Evento e;
             e.ID_evento = alarmasPendientes[i].IDevento;
+						disable_isr_fiq();
             cola_guardar_evento(e);
-
+						enable_isr_fiq();
             //Se invalida la alarma si no es periódica
             if (!alarmasPendientes[i].esPeriodica) {
 							alarmasPendientes[i].esValida = 0;
@@ -75,7 +76,9 @@ void set_Alarma(uint8_t id, int periodo, int periodica){
 		eAlarma.auxData = eAlarma.auxData << 23;
 		eAlarma.auxData = eAlarma.auxData | retardo;
 		eAlarma.timestamp = clock_gettime() / 1000;
+		disable_isr_fiq();
 		cola_guardar_evento(eAlarma); 
+		enable_isr_fiq();
 }
 
 /*

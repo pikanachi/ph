@@ -28,7 +28,9 @@ void eint1_ISR (void) __irq {
 	//Encolar evento de pulsacion
   ePulsacion.ID_evento = Pulsacion_EINT1;
   //ePulsacion.timestamp = temporizador_leer() / 1000;
+	disable_isr_fiq();
   cola_guardar_evento(ePulsacion); 
+	enable_isr_fiq();
 }
 
 

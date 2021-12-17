@@ -20,7 +20,7 @@ void cola_crear_vacia(void) {
  * el Evento más antiguo de la cola, activando el flag V (Overflow).
  */
 void cola_guardar_evento(Evento e) {
-	disable_isr_fiq();
+	//disable_isr_fiq();
 	c.eventos[c.indProxEv] = e;
 
 	if (!cola_es_vacia() && c.indPrimEv == c.indProxEv) {   //Overflow
@@ -31,7 +31,7 @@ void cola_guardar_evento(Evento e) {
 		c.numEventos++;
 	}
 	c.indProxEv = (c.indProxEv + 1) % MAX_EVENTOS;
-	enable_isr_fiq();
+	//enable_isr_fiq();
 }
 
 

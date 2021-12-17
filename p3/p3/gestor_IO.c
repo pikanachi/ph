@@ -125,7 +125,9 @@ void gIO_escribir_entrada(void){
 			gIO_encender_validacion();
 			eTerminar.ID_evento = Terminar;
 			eTerminar.timestamp = temporizador_leer() / 1000;
+			disable_isr_fiq();
 			cola_guardar_evento(eTerminar);
+			enable_isr_fiq();
 		}
 		else{
 			if(valor >= 1 && valor  <= 9){
