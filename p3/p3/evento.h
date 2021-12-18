@@ -42,7 +42,9 @@ enum {
 		No_Confir_Jugada = 12,
 		Latido_Validacion = 13,
 		Candidatos = 14,
-		Jugada = 15
+		Jugada = 15,
+		Feed = 16,
+		Start = 17
 };
 
 /*

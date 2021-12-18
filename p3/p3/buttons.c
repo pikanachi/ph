@@ -13,6 +13,7 @@ static volatile int nueva_pulsacion_eint2;
 void eint1_ISR (void) __irq {
 	Evento ePulsacion;
 	int retardo;
+	disable_isr_fiq();
 	EXTINT =  EXTINT | 0x2;      		  								// clear interrupt flag
 	VICVectAddr = 0;                     							// Acknowledge Interrupt
 	VICIntEnClr = 0x00008000;    											// deshabilitar eint1 pone a 1 bit 15	
@@ -28,7 +29,6 @@ void eint1_ISR (void) __irq {
 	//Encolar evento de pulsacion
   ePulsacion.ID_evento = Pulsacion_EINT1;
   //ePulsacion.timestamp = temporizador_leer() / 1000;
-	disable_isr_fiq();
   cola_guardar_evento(ePulsacion); 
 	enable_isr_fiq();
 }
@@ -40,6 +40,8 @@ void eint1_ISR (void) __irq {
 void eint2_ISR (void) __irq {
 	Evento ePulsacion;
 	int retardo;
+	
+	disable_isr_fiq();
 	
 	VICIntEnClr = 0x00010000;    											// deshabilitar eint2 pone a 1 bit 16
 	EXTINT =  EXTINT | 0x4;        										// clear interrupt flag   
@@ -58,6 +60,7 @@ void eint2_ISR (void) __irq {
 	retardo = TIME_PWDN & 0x007FFFFF;     						// Asegurarnos que el retardo es de 23bits
 	set_Alarma(Power_Down, retardo, 1);
 	VICVectAddr = 0;                     							// Acknowledge Interrupt
+	enable_isr_fiq();
 }
 
 /*

@@ -67,7 +67,9 @@ void gp_actualizar_estado_EINT1(void) {
 				
 				//Cancelar alarma EINT1
 				retardo = 0;
+				disable_isr_fiq();
 				set_Alarma(Check_Pulsacion_EINT1, retardo, 1);
+				enable_isr_fiq();
 			}
 			break;
 		case NO_PULSADO:
@@ -96,7 +98,9 @@ void gp_actualizar_estado_EINT2(void) {
 				
 				//Cancelar alarma EINT2
 				retardo = 0;
+				disable_isr_fiq();
 				set_Alarma(Check_Pulsacion_EINT2, retardo, 1);
+				enable_isr_fiq();
 			}
 			break;
 		case NO_PULSADO:

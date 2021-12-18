@@ -11,6 +11,8 @@ static unsigned int fila = 0;
 static unsigned int columna = 0;
 static unsigned int valor = 0;
 static uint8_t jugada = 0;
+static uint8_t old_valor = 0;
+static uint8_t empezado = 0;
 
 char frase[10];
 
@@ -29,11 +31,7 @@ void actualizar_estado(char c){
 	switch(estado){
 		case ESPERA_CMD:
 			if(c == '#'){
-				//ressetear buffers
-				memset(&rec_buffer[0], 0, sizeof(rec_buffer)); 	//Wipe previous buffer
-				index_rec_buffer = 0;
 				csum = 0;
-				
 				estado = ESPERA_NRNUM;
 				U0THR = c;
 				index_rec_buffer++;
@@ -43,12 +41,14 @@ void actualizar_estado(char c){
 			}
 			break;
 		case ESPERA_NRNUM:
-			if(c == 'N' || c == 'R' || (c >= '1' && c <= '9')){
+			if(c == 'N') {
 				U0THR = c;
 				index_rec_buffer++;
-				if(c == 'N'){
-					estado = ESPERA_E;
-				} else if(c == 'R') {
+				estado = ESPERA_E;
+			} else if((c == 'R' || (c >= '1' && c <= '9')) && empezado){
+				U0THR = c;
+				index_rec_buffer++;
+				if(c == 'R') {
 					estado = ESPERA_S;
 				} else {
 					csum += c - '0';
@@ -278,15 +278,16 @@ void uart_enviar_candidatos(int fil, int col){
 	enviar_string(msg);
 }
 
-void uart_introducir_jugada(){
+void uart_introducir_jugada(int fil, int col){
 	//int tiempo;
 	char msg2[100];
-	if(esPista(cuadricula_C_C[fila][columna])){
+	if(esPista(cuadricula_C_C[fil][col])){
 		strcpy(msg2, "\nLa celda en la que quieres introducir valor es una pista\n");
 			enviar_string(msg2);
 	} else{
-		celda_poner_valor(&cuadricula_C_C[fila][columna], valor);
-				checkError(&cuadricula_C_C[fila][columna]);
+		old_valor = celda_leer_valor(cuadricula_C_C[fil][col]);
+		celda_poner_valor(&cuadricula_C_C[fil][col], valor);
+				checkError(&cuadricula_C_C[fil][col], old_valor);
 		candidatos_actualizar_c(cuadricula_C_C);
 		jugada = 1;
 		actualizar_uart("¿Confirmar jugada?\n\0");
@@ -297,16 +298,20 @@ void uart_introducir_jugada(){
 
 void acaba_jugada(void){
 	jugada = 0;
+	disable_isr_fiq();
 	set_Alarma(Latido_Validacion,0,0);
+	enable_isr_fiq();
 }
 
 void cancelar_jugada(void){
-	celda_poner_valor(&cuadricula_C_C[fila][columna], 0);
-	checkError(&cuadricula_C_C[fila][columna]);
+	celda_poner_valor(&cuadricula_C_C[fila][columna], old_valor);
+	checkError(&cuadricula_C_C[fila][columna], old_valor);
 	candidatos_actualizar_c(cuadricula_C_C);
 	actualizar_uart("Jugada cancelada\nIntroduce tu comando-->\0");
 	jugada = 0;
+	disable_isr_fiq();
 	set_Alarma(Latido_Validacion,0,0);
+	enable_isr_fiq();
 }
 
 /*
@@ -315,14 +320,19 @@ void cancelar_jugada(void){
 void serial_ISR (void) __irq {
 	int mask;
 	int retardo;
-	VICVectAddr = 0;
 	
+	disable_isr_fiq();	
+
+	VICVectAddr = 0;
+		
 	mask = 0xE; 																							// Nos quedamos con los bits 3:1 que nos dicen que tipo de interr ha sido
 	mask &= U0IIR; 																			 			// Interrupt ID register (if read clears the interrupt)
 	
 	// Recibo datos de UART0 (3:1 = 010) (man pg 88)
 	if (mask == 0x4) {
 		if(ha_terminado() && jugada == 0){
+			retardo = TIME_PWDN & 0x007FFFFF;     			// Asegurarnos que el retardo es de 23bits
+			set_Alarma(Power_Down, retardo, 1);
 			if (index_rec_buffer < MAX_REC_BUFFER) {							// Appendear mensaje al buffer si cabe para no irnos de vacas por la memoria
 				rec_buffer[index_rec_buffer] = U0RBR;								// Receiver send_buffer RBR Register (nos da el caracter introducido en la UART)
 				actualizar_estado(rec_buffer[index_rec_buffer]);	
@@ -330,23 +340,25 @@ void serial_ISR (void) __irq {
 					//hacer lo que sea que diga la accion
 					if (strcmp(rec_buffer, "#RST!") == 0) {
 						// Terminar partida
-						strcpy(frase, "terminar");
+						Evento jugada;
+						empezado = 0;
+						jugada.ID_evento = Terminar;
+						cola_guardar_evento(jugada);
 					} else if (strcmp(rec_buffer, "#NEW!") == 0) {
 						// Nueva partida
-						strcpy(frase, "nueva");
+						Evento jugada;
+						empezado = 1;
+						jugada.ID_evento = Start;
+						cola_guardar_evento(jugada);	
 					} else if (rec_buffer[index_rec_buffer - 1] >= '0' && rec_buffer[index_rec_buffer - 1] <= '9' && rec_buffer[index_rec_buffer - 2] >= '0' && rec_buffer[index_rec_buffer - 2] <= '9'  && rec_buffer[index_rec_buffer - 3] >= '0' && rec_buffer[index_rec_buffer - 3] <= '9' && rec_buffer[index_rec_buffer - 4] >= '0' && rec_buffer[index_rec_buffer - 4] <= '9') {
-						uart_introducir_jugada();
-					/*
+						//uart_introducir_jugada();
 						Evento jugada;
 						jugada.ID_evento = Jugada;
-						jugada.auxData = rec_buffer[index_rec_buffer - 3] - '0'; //Fila
+						jugada.auxData = rec_buffer[index_rec_buffer - 4] - '0'; //Fila
 						jugada.auxData <<= 8;
-					  jugada.auxData |= rec_buffer[index_rec_buffer - 2] - '0'; //Columna
-						disable_isr_fiq();
-						cola_guardar_evento(jugada);
-						enable_isr_fiq();
+					  jugada.auxData |= rec_buffer[index_rec_buffer - 3] - '0'; //Columna
+						cola_guardar_evento(jugada);					
 					
-					*/
 					}	else if (rec_buffer[index_rec_buffer - 1] == 'C' && rec_buffer[index_rec_buffer - 2] >= '0' && rec_buffer[index_rec_buffer - 2] <= '9'  && rec_buffer[index_rec_buffer - 3] >= '0' && rec_buffer[index_rec_buffer - 3] <= '9') {
 						//uart_enviar_candidatos();
 						//------------------------------------------------------------------
@@ -355,9 +367,7 @@ void serial_ISR (void) __irq {
 						candidatos.auxData = rec_buffer[index_rec_buffer - 3] - '0'; //Fila
 						candidatos.auxData <<= 8;
 					  candidatos.auxData |= rec_buffer[index_rec_buffer - 2] - '0'; //Columna
-						disable_isr_fiq();
 						cola_guardar_evento(candidatos);
-						enable_isr_fiq();
 						//-------------------------------------------------------------------
 					}	
 					//rec_buffer[index_rec_buffer] = '.';
@@ -381,8 +391,7 @@ void serial_ISR (void) __irq {
 			// Mandar al planificador evento para que continue el planificador
 		}
 	}
-	retardo = TIME_PWDN & 0x007FFFFF;     			// Asegurarnos que el retardo es de 23bits
-	set_Alarma(Power_Down, retardo, 1);
+	enable_isr_fiq();
 }
 
 /*
@@ -415,4 +424,9 @@ void enviar_string(char *string) {
 	}
 	U0THR = send_buffer[index_send_buffer]; 							//manda el primer caracter a la UART0
 	index_send_buffer++;
+}
+
+void uart_borrar_tablero(void){
+	borrar_tablero(cuadricula_C_C);
+	candidatos_actualizar_c(cuadricula_C_C);
 }

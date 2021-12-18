@@ -10,10 +10,8 @@ static volatile unsigned int timer1_int_count = 0;
  */
 void timer0_ISR (void) __irq {
     //Cuando llega el temporizador periódico, encola el evento de temporizador periódico
-		disable_isr_fiq();
     ga_encolar_evento_temp();
 		T0IR = 1;
-	enable_isr_fiq();
 		//VICVectAddr = 0;
 }
 
@@ -21,9 +19,11 @@ void timer0_ISR (void) __irq {
  * ISR para el timer1
  */
 void timer1_ISR (void) __irq {
+		disable_isr_fiq();
     timer1_int_count++;
 		T1IR = 1;
 		VICVectAddr = 0;
+		enable_isr_fiq();
 }
 
 /*

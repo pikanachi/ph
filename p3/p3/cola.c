@@ -1,6 +1,8 @@
 #include "cola.h"
 #include "gestor_IO.h"
 #include "softI.h"
+#include <string.h>
+
 
 static Cola c;  //static para que no la lie al compilar con otras globales (otra var con el mismo nombre en otro c)
 
@@ -84,5 +86,6 @@ Evento cola_ultimo(void) {
  * Llama a crearVacia
  */
 void vaciar_cola(void){
+	memset(&c.eventos[0], 0, sizeof(c));
 	cola_crear_vacia();
 }

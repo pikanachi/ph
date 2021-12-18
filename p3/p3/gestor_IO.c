@@ -19,11 +19,13 @@ void gIO_inicializar(void) {
   GPIO_iniciar();
 	candidatos_actualizar_c(cuadricula_C_C);
 	retardo = TIME_CHECK_IO & 0x007FFFFF;     				// Asegurarnos que el retardo es de 23bits
+	disable_isr_fiq();
 	set_Alarma(Check_Entrada, retardo, 1);
-	
+	enable_isr_fiq();
 	retardo = LATIDO & 0x007FFFFF;     				// Asegurarnos que el retardo es de 23bits
+	disable_isr_fiq();
 	set_Alarma(Latido, retardo, 1);
-	
+	enable_isr_fiq();
 
 }
 
@@ -95,7 +97,9 @@ void gIO_check_entrada(void){
 			//---------------------------------------------
 			//Actualizar contador para PWDOWN
 			retardo = TIME_PWDN & 0x007FFFFF;     						// Asegurarnos que el retardo es de 23bits
+			enable_isr_fiq();
 			set_Alarma(Power_Down, retardo, 1);
+			disable_isr_fiq();
 		}
 	}
 }
@@ -139,7 +143,9 @@ void gIO_escribir_entrada(void){
 						int retardo;
 						gIO_encender_validacion();
 						retardo = TIME_VALI_LED & 0x007FFFFF;     							// Asegurarnos que el retardo es de 23bits
+						disable_isr_fiq();
 						set_Alarma(Apagar_Validacion, retardo, 0);
+						enable_isr_fiq();
 						celda_poner_valor(&cuadricula_C_C[fila][columna], valor);
 						candidatos_actualizar_c(cuadricula_C_C);
 						gIO_mostrar_candidatos();
@@ -164,7 +170,9 @@ void gIO_eliminar_valor(void){
 			int retardo;
 			gIO_encender_validacion();
 			retardo = TIME_VALI_LED & 0x007FFFFF;     										// Asegurarnos que el retardo es de 23bits
+			disable_isr_fiq();
 			set_Alarma(Apagar_Validacion, retardo, 0); 
+			enable_isr_fiq();
 			celda_poner_valor(&cuadricula_C_C[fila][columna], 0);
 			candidatos_actualizar_c(cuadricula_C_C);
 			gIO_mostrar_candidatos();

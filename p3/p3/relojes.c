@@ -35,6 +35,7 @@ void WD_init(int sec){
 		//ASignar <sec> como tiempo para resetear para el WD
 	WDTC = sec * 256 * 61476;
 	WDMOD = 3;
+	set_Alarma(Feed, 5000, 1);
 }
 
 void WD_feed(void){

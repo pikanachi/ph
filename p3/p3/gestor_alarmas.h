@@ -26,6 +26,7 @@ void set_Alarma(uint8_t id, int periodo, int periodica);
  */
 void ga_inicializar(void);
 
+void ga_borrar_alarmas(void);
 
 /*
  * Una vez que llega un evento de Temp_perio se comprueban las alarmas del gestor.

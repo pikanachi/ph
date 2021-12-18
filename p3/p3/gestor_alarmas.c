@@ -1,4 +1,5 @@
 #include "gestor_alarmas.h"
+#include <string.h>
 
 #define NUM_EVENTOS 8
 
@@ -76,9 +77,7 @@ void set_Alarma(uint8_t id, int periodo, int periodica){
 		eAlarma.auxData = eAlarma.auxData << 23;
 		eAlarma.auxData = eAlarma.auxData | retardo;
 		eAlarma.timestamp = clock_gettime() / 1000;
-		disable_isr_fiq();
 		cola_guardar_evento(eAlarma); 
-		enable_isr_fiq();
 }
 
 /*
@@ -135,4 +134,8 @@ void ga_encolar_evento_temp(void) {
     e.ID_evento = Temp_perio;
     e.timestamp = clock_gettime() / 1000;   // En ms
     cola_guardar_evento(e);
+}
+
+void ga_borrar_alarmas(void){
+	memset(&alarmasPendientes[0], 0, sizeof(alarmasPendientes));
 }

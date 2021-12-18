@@ -29,5 +29,8 @@ void actualizar_uart(char *msgFinal);
 void cancelar_jugada(void);
 void acaba_jugada(void);
 void uart_enviar_candidatos(int fil, int col);
+void uart_introducir_jugada(int fil, int col);
+void actualizar_tablero(void);
+void uart_borrar_tablero(void);
 
 #endif

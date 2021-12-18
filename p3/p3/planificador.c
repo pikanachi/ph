@@ -11,7 +11,7 @@ void planificador_main(void) {
 	//Empezar la cola de eventos
 	cola_crear_vacia();
 	RTC_init();
-	//WD_init(10);
+	WD_init(20);
 
 	//Inicializar gestores
 	GPIO_marcar_entrada(14,16);
@@ -21,10 +21,10 @@ void planificador_main(void) {
 	gIO_inicializar();
 	gp_inicializar();
 	ge_inicializar();
-	//WD_feed();
+	WD_feed();
 	init_serial_byInterrupt(); 
-	actualizar_uart("Introduce tu comando-->\0");
-
+	//actualizar_uart("Introduce tu comando-->\0");
+	enviar_string("--SUDOKU--\nEmpezar partida #NEW!\nTerminar partida #RST!\nConsultar candidatos #fcC!\nIntroducir jugada #fcvs!\nDonde: \nf es la fila(1-9)\nc es la columna(1-9)\nv es el valor a introducir(0 para borrar, 1-9)\ns es el chechsum(f+c+v%8)\nIntroduce tu comando-->\0");
 	while(1) {
 		if(gIO_leer_overflow()){
 			while(1);
@@ -57,8 +57,10 @@ void planificador_main(void) {
 						//Se comprueba si sigue pulsada EINT1
 						//gIO_escribir_entrada();
 						//CONFIRMAR ENTRADA (Cancelar la alarma de No_Confir_Entrada)
+						disable_isr_fiq();
 						set_Alarma(No_Confir_Jugada,0,0);
-						acaba_jugada();
+						enable_isr_fiq();
+					acaba_jugada();
 						enviar_string("Jugada confirmada\nIntroduce comando-->\0");
 						break;
 					case Pulsacion_EINT2 :
@@ -79,19 +81,13 @@ void planificador_main(void) {
 						break;
 					case Terminar:
 						//Se reinicia el tablero
-						gIO_borrar_tablero();
-						//Se encola un evento para chequear la pulsación de fin
-						retardo = TIME_AL_PUL_TER & 0x007FFFFF;     					// Asegurarnos que el retardo es de 23bits
-						eAlarma.ID_evento = Set_Alarma;
-						eAlarma.auxData = Check_Pulsacion_Terminar;  					// ID evento a generar
-						eAlarma.auxData = eAlarma.auxData << 1;
-						eAlarma.auxData = eAlarma.auxData | 1;         				// Es periódica
-						eAlarma.auxData = eAlarma.auxData << 23;
-						eAlarma.auxData = eAlarma.auxData | retardo;
+						uart_borrar_tablero();
 						eAlarma.timestamp = temporizador_leer() / 1000;
 						disable_isr_fiq();
 						cola_guardar_evento(eAlarma); 
-						enable_isr_fiq();
+						enable_isr_fiq(); 
+						vaciar_cola();
+						ge_modo_pwdwn();
 						break;
 					case Check_Pulsacion_Terminar:
 						//Poner al procesador en modo powerDown
@@ -126,14 +122,18 @@ void planificador_main(void) {
 						fil = evento.auxData >> 8;
 						uart_enviar_candidatos(fil - 1, col - 1);
 						break; 
-					/*
+					
 					//Cambiar el .h y .c para que acepte parametros si descomento <-----IMPORTANT!!!!
 					case Jugada:
 						col = evento.auxData & 0xFF;
 						fil = evento.auxData >> 8;
 						uart_introducir_jugada(fil - 1, col - 1);
 						break; 
-					*/
+					case Feed:
+						WD_feed();
+						break;
+					case Start:
+						actualizar_uart("Introduce tu comando-->\0");
 				}
 			}
 		} else { // Cola vacia
