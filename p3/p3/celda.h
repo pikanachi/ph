@@ -78,7 +78,7 @@ static int celda_noEsCandidato(CELDA celda, uint8_t valor){
 }
 
 static void checkError(CELDA *celda, uint8_t old_valor){
-	int mask = 0x7;
+	int mask = 0xF;
 	int valor = mask & *celda;
 	if(valor == 0){
 		mask = 1 << 5;
@@ -86,7 +86,7 @@ static void checkError(CELDA *celda, uint8_t old_valor){
 		*celda = *celda & mask;
 	} else{
 		if(old_valor != valor){
-				mask = 1 <<(6 + valor);
+			mask = 1 <<(6 + valor);
 			mask = mask & *celda;
 			mask = mask >> (6 + valor);
 			mask = mask << 5;

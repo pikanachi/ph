@@ -28,6 +28,7 @@ static char msg[MAX_SEND_BUFFER];
 
 void actualizar_estado(char c){
 	static int csum = 0;
+	int era_exec = 0;
 	switch(estado){
 		case ESPERA_CMD:
 			if(c == '#'){
@@ -135,30 +136,22 @@ void actualizar_estado(char c){
 				index_rec_buffer++;
 			} else{
 				estado = ESPERA_CMD;
-				enviar_string("\nChecksum incorrecta\n");
+				enviar_string("\nChecksum incorrecta\nIntroduce tu comando-->\0");
 			}
 			break;
 		case ESPERA_EXC:
 			if(c == '!'){
 				U0THR = c;
-				//enviar_string("\ngudCMD\n");
-			} else{
-				enviar_string("\nInstruccion no reconocida\nIntroduce tu comando-->\0");
 			}
 			estado = ESPERA_CMD;
+			era_exec = 1;
 			break;
 	}
-}
-
-void cat(char *dest, char *catenado){
-	int i, a;
-	for(i = 0; dest[i]!= '\0';i++);
-	// dest[i] = '\0'
-	for(a = 0; catenado[a] != '\0'; a++){
-		dest[i] = catenado[a];
-		i++;
+	if (estado == ESPERA_CMD && !era_exec) {
+		memset(&rec_buffer[0], 0, sizeof(rec_buffer)); 		//Clear buffer
+		era_exec = 0;
+		index_rec_buffer = 0;
 	}
-	dest[i] = '\0';
 }
 
 void actualizar_uart(char *msgFinal){
@@ -173,19 +166,10 @@ void actualizar_uart(char *msgFinal){
 	msg[1] = 'L';
 	msg[2] = 'R';
 	msg[2] = '\0';
-	cat(msg,"\n");
+	strcat(msg,"\n");
 	for(i = 0; i < 19; i++){
 		if(i%2 == 0){//Delimitadores
-			/*
-			enviar_string("+ - - +");
-			for(j = 0; j < 8; j++){
-				if(j == 7){
-					enviar_string(" - - +\n");
-				} else{
-					enviar_string(" - - +");
-				}
-			}
-			*/cat(msg,"+ - - + - - + - - + - - + - - + - - + - - + - - + - - +\n");
+			strcat(msg,"+ - - + - - + - - + - - + - - + - - + - - + - - + - - +\n");
 		} else{
 			f = i - resta;
 			resta++;
@@ -203,7 +187,7 @@ void actualizar_uart(char *msgFinal){
 				straux[0] = ' ';
 				straux[1] = aux;
 				straux[2] = '\0';
-				cat(msg, straux);
+				strcat(msg, straux);
 				if (esPista(cuadricula_C_C[f][j])){
 					strcat(msg, " P |");
 				} else if(esError(cuadricula_C_C[f][j])){
@@ -274,7 +258,7 @@ void uart_enviar_candidatos(int fil, int col){
 	} else{
 		strcpy(msg, "\nLa celda seleccionada es una pista\n");
 	}
-	strcat(msg,"Introduce tu comando-->\0");
+	strcat(msg,"Introduce tu comando-->");
 	enviar_string(msg);
 }
 
@@ -291,8 +275,11 @@ void uart_introducir_jugada(int fil, int col){
 		candidatos_actualizar_c(cuadricula_C_C);
 		jugada = 1;
 		actualizar_uart("¿Confirmar jugada?\n\0");
+		
+		disable_isr_fiq();
 		set_Alarma(No_Confir_Jugada,3000,0);
 		set_Alarma(Latido_Validacion,100,1);
+		enable_isr_fiq();
 	}
 }
 
