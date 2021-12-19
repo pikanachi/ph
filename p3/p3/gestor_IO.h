@@ -13,6 +13,8 @@
  */
 void gIO_inicializar(void);
 
+void gIO_reset(void);
+
 /*
  * Muestra el valor de los candidatos de la celda seleccionada (fila y columna) 
  * en el GPIO

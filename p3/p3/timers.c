@@ -18,12 +18,20 @@ void timer0_ISR (void) __irq {
 /*
  * ISR para el timer1
  */
-void timer1_ISR (void) __irq {
+void timer1_ISR(void) __irq {
 		disable_isr_fiq();
     timer1_int_count++;
 		T1IR = 1;
 		VICVectAddr = 0;
 		enable_isr_fiq();
+}
+
+/*
+ * Resetea el timer 1
+ */ 
+void reset_timer1(void) {
+		T1TC = 0;
+		timer1_int_count = 0;
 }
 
 /*

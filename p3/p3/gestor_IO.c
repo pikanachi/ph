@@ -17,7 +17,6 @@ static uint8_t old_columna = 10;
 void gIO_inicializar(void) {
 	int retardo;
   GPIO_iniciar();
-	candidatos_actualizar_c(cuadricula_C_C);
 	retardo = TIME_CHECK_IO & 0x007FFFFF;     				// Asegurarnos que el retardo es de 23bits
 	disable_isr_fiq();
 	set_Alarma(Check_Entrada, retardo, 1);
@@ -27,6 +26,18 @@ void gIO_inicializar(void) {
 	set_Alarma(Latido, retardo, 1);
 	enable_isr_fiq();
 
+}
+
+void gIO_reset() {
+	int retardo;
+	retardo = TIME_CHECK_IO & 0x007FFFFF;     				// Asegurarnos que el retardo es de 23bits
+	disable_isr_fiq();
+	set_Alarma(Check_Entrada, retardo, 1);
+	enable_isr_fiq();
+	retardo = LATIDO & 0x007FFFFF;     				// Asegurarnos que el retardo es de 23bits
+	disable_isr_fiq();
+	set_Alarma(Latido, retardo, 1);
+	enable_isr_fiq();	
 }
 
 /*

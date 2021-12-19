@@ -1,11 +1,9 @@
 #include "gpio.h"
 
 void GPIO_iniciar(){ 
-	//bit 31: output | bit 30: output | bit 27-24: input | bit 23-20: input | bit 19-16: input | bit 15-14: input | bit 13: output | bit 12-4 : output | bit 3-0: output
-	//2_11000000000000000011111111111111
-	//0xC0003FFF
-	//IODIR = 0xC0003FFF;
-	//IOCLR = 0xC0003FFF; //Inicializo los outputs a 0
+	GPIO_marcar_entrada(14,16);
+	GPIO_marcar_salida(30,2);
+	GPIO_marcar_salida(0,14);
 }
 
 uint32_t GPIO_leer(uint8_t bit_inicial, uint8_t num_bits) {

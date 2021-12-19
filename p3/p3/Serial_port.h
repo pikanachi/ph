@@ -19,18 +19,57 @@ enum {
 	ESPERA_CHECK = 9,
 };
 
-void init_serial (void);
-int sendchar (int ch) ;
-int getchar (void);
-void init_serial_byInterrupt(void);
-void enviar_string(char *string);
+/*
+ * Actualiza el sudoku mostrado en la UART
+ */
+void UART_actualizar(char *msgFinal);
+
+/*
+ * Devuelve 1 si se ha terminado de enviar el string a la UART. 0 en caso contrario
+ */
 uint8_t ha_terminado(void);
-void actualizar_uart(char *msgFinal);
-void cancelar_jugada(void);
-void acaba_jugada(void);
-void uart_enviar_candidatos(int fil, int col);
-void uart_introducir_jugada(int fil, int col);
-void actualizar_tablero(void);
-void uart_borrar_tablero(void);
+
+/*
+ * Escribe por la UART los candidatos de la celda correspondiente a la fila fil y de la columna col.
+ * Si la celda seleccionada era una pista devuelve el mensaje "La celda seleccionada 
+ * es una pista"
+ */
+void UART_enviar_candidatos(int fil, int col);
+
+/* 
+ * Procesa la jugada que el usuario quiere introducir en la celda correspondiente a la fila fil y
+ * la columna col. Si la celda seleccionada era una pista devuelve el mensaje "La celda en la que 
+ * quieres introducir valor es una pista"
+ * Si la juagada es valida, envia el mensaje "¿Confirmar jugada?" la realiza, pone una alarma a 3
+ * seg para que el usuario valide la juagada y enciende con otra alarma el led de latido.
+ */
+void UART_introducir_jugada(int fil, int col);
+
+/*
+ * Apaga el led de latido de validación con una alarma con su tiempo a 0
+ */
+void UART_acaba_jugada(void);
+
+/*
+ * Si el usuario no valida la jugada, se cancela y muestra el mensaje
+ * "Jugada cancelada"
+ */
+void UART_cancelar_jugada(void);
+
+/*
+ * Inicializa las interrupciones de la UART0
+ */
+void UART_init_serial(void);
+
+/*
+ * Manda el string a la UART. Copia el string en un buffer send_buffer y manda el primer caracter
+ * del buffer a la UART
+ */
+void UART_enviar_string(char *string);
+
+/*
+ * Borra el tablero y recalcula los candidatos
+ */
+void UART_borrar_tablero(void);
 
 #endif

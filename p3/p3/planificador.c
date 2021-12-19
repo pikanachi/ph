@@ -8,13 +8,15 @@
 
 #define TIME_AL_PUL_TER 100
 
+char empieza[] = "\n                 SUDOKU                 \n----------------------------------------\nEmpezar partida #NEW!\nTerminar partida #RST!\nConsultar candidatos #fcC!\nIntroducir jugada #fcvs!\nDonde: \nf es la fila(1-9)\nc es la columna(1-9)\nv es el valor a introducir(0 para borrar, 1-9)\ns es el chechsum((f+c+v)%8)\n\nIntroduce tu comando-->";
+
+
 void planificador_main(void) {
 	int fil, col;
 	int terminar;
 	char time[20];
 	char secs[2];
 	char msg[320];
-	char empieza[] = "          SUDOKU          \n--------------------------\nEmpezar partida #NEW!\nTerminar partida #RST!\nConsultar candidatos #fcC!\nIntroducir jugada #fcvs!\nDonde: \nf es la fila(1-9)\nc es la columna(1-9)\nv es el valor a introducir(0 para borrar, 1-9)\ns es el chechsum((f+c+v)%8)\n\nIntroduce tu comando-->";
 	
 	//Empezar la cola de eventos
 	cola_crear_vacia();
@@ -22,41 +24,41 @@ void planificador_main(void) {
 	WD_init(20);
 
 	//Inicializar gestores
-	GPIO_marcar_entrada(14,16);
-	GPIO_marcar_salida(30,2);
-	GPIO_marcar_salida(0,14);
-	
 	ga_inicializar();
-	
 	gIO_inicializar();
 	gp_inicializar();
 	ge_inicializar();
 	WD_feed();
-	init_serial_byInterrupt(); 
+	UART_init_serial(); 
 	while(1) {	
 		if (terminar) {
 			//Resetear el rtc
 			sprintf(time, "%d", RTC_leer_minutos());
 			sprintf(secs, "%d", RTC_leer_segundos());
-			strcpy(msg, "\nTiempo de juego: ");
+			strcpy(msg,"\n\n            PARTIDA FINALIZADA          \n----------------------------------------\n");
+			strcat(msg, "Tiempo de juego: ");
 			strcat(msg, time);
 			strcat(msg, " m ");
 			strcat(msg, secs);
-			strcat(msg, " s\n\n");
+			strcat(msg, " s\n");
+			
+			sprintf(time, "%d", tiempo_actualizar());
+			strcat(msg, "Tiempo candidatos actualizar: ");
+			strcat(msg, time);
+			strcat(msg, " ms\n");
 			strcat(msg, empieza);	
-			enviar_string(msg);
-			RTC_reset();
+			UART_enviar_string(msg);
+			
+			RTC_init();
+			reset_timer1();
 			WD_init(20);				// Resetear el WD para volver a crear su alarma
-			
-			
-			//gIO_inicializar();
-			//gp_inicializar();
-			//ge_inicializar();
+			reset_tiempo_actualizar();
+			gIO_reset();
+			ge_inicializar();
 			WD_feed();
-			//init_serial_byInterrupt(); 
 			
 		} else {
-			enviar_string(empieza);
+			UART_enviar_string(empieza);
 		}
 		terminar = 0;
 		while(!terminar) {
@@ -67,8 +69,6 @@ void planificador_main(void) {
 				Evento evento;
 				evento = cola_desencola_mas_antiguo();
 				if (es_valido(&evento)) {
-					int retardo;
-					Evento eAlarma;
 					switch(evento.ID_evento) {
 						case Temp_perio :
 							//Ha saltado el temporizador periódico
@@ -94,8 +94,8 @@ void planificador_main(void) {
 							disable_isr_fiq();
 							set_Alarma(No_Confir_Jugada,0,0);
 							enable_isr_fiq();
-						acaba_jugada();
-							enviar_string("Jugada confirmada\nIntroduce comando-->\0");
+							UART_acaba_jugada();
+							UART_enviar_string("Jugada confirmada\nIntroduce tu comando-->\0");
 							break;
 						case Pulsacion_EINT2 :
 							//Borrar dato seleccionado de la celda
@@ -115,11 +115,12 @@ void planificador_main(void) {
 							break;
 						case Terminar:
 							//Se reinicia el tablero
-							uart_borrar_tablero();
+							UART_borrar_tablero();
 							vaciar_cola();
 							ga_reset();
 							terminar = 1;	
 							break;
+						/*
 						case Check_Pulsacion_Terminar:
 							//Poner al procesador en modo powerDown
 							if(gp_leer_pulsacion_1() == 0){ 											// Se ha despulsado
@@ -138,11 +139,12 @@ void planificador_main(void) {
 								ge_modo_pwdwn();
 							}
 							break;
+							*/
 						case Latido:
 							gIO_alternar_latido();
 							break;
 						case No_Confir_Jugada:
-							cancelar_jugada();
+							UART_cancelar_jugada();
 							break;
 						case Latido_Validacion:
 							gIO_alternar_validacion();
@@ -150,18 +152,18 @@ void planificador_main(void) {
 						case Candidatos:
 							col = evento.auxData & 0xFF;
 							fil = evento.auxData >> 8;
-							uart_enviar_candidatos(fil - 1, col - 1);
+							UART_enviar_candidatos(fil - 1, col - 1);
 							break; 
 						case Jugada:
 							col = evento.auxData & 0xFF;
 							fil = evento.auxData >> 8;
-							uart_introducir_jugada(fil - 1, col - 1);
+							UART_introducir_jugada(fil - 1, col - 1);
 							break; 
 						case Feed:
 							WD_feed();
 							break;
 						case Start:
-							actualizar_uart("Introduce tu comando-->\0");
+							UART_actualizar("Introduce tu comando-->\0");
 					}
 				}
 			} else { // Cola vacia

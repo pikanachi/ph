@@ -15,10 +15,6 @@ void RTC_init(void){
 	PCONP = PCONP | 0x100;
 }
 
-void RTC_reset(void) {
-	CCR = 2;	//Resetear la cuenta(Poner a 1 el bit 1 del CCR)	
-}
-
 uint32_t RTC_leer_minutos(void) {
 	uint32_t res;
 	res = MIN;
@@ -36,10 +32,12 @@ uint32_t RTC_leer_segundos(void) {
 
 void WD_init(int sec){	
 	//Poner el WDEN(bit 0 del WDMOD) y el WDRESET(bit 1 del WDMOD) a 1
-		//ASignar <sec> como tiempo para resetear para el WD
+	//ASignar <sec> como tiempo para resetear para el WD
 	WDTC = sec * 256 * 61476;
 	WDMOD = 3;
+	disable_isr_fiq();
 	set_Alarma(Feed, 5000, 1);
+	enable_isr_fiq();
 }
 
 void WD_feed(void){

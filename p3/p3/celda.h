@@ -71,6 +71,14 @@ static int esError(CELDA celda){
 	return celda & 0x0020;
 }
 
+__inline void celda_borrarError(CELDA *celdaptr) {
+	*celdaptr = *celdaptr & 0xFFFFFFDF;
+}
+
+__inline void celda_ponerError(CELDA *celdaptr) {
+	*celdaptr = *celdaptr | 0x20;
+}
+	
 static int celda_noEsCandidato(CELDA celda, uint8_t valor){
 	int mask = 1 << (6 + valor);
 	mask = mask & celda;

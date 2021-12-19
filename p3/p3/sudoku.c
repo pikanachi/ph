@@ -1,18 +1,16 @@
 #include <stddef.h>
+#include "timers.h"
 #include "sudoku.h"
 
-/* *****************************************************************************
+int tiempo_act = 0;
+
+/*
  * propaga el valor de una determinada celda en C
  * para actualizar las listas de candidatos
  * de las celdas en su su fila, columna y region
  * Recibe como parametro la cuadricula, y la fila y columna de
  * la celda a propagar; no devuelve nada
  */
- 
-
- 
-
-
 void candidatos_propagar_c(CELDA cuadricula[NUM_FILAS][NUM_COLUMNAS],
 	uint8_t fila, uint8_t columna)
 {
@@ -55,8 +53,8 @@ void candidatos_propagar_c(CELDA cuadricula[NUM_FILAS][NUM_COLUMNAS],
  * Recibe la cuadricula como primer parametro
  * y devuelve en celdas_vacias el n?mero de celdas vacias
  */
-int candidatos_actualizar_c(CELDA cuadricula[NUM_FILAS][NUM_COLUMNAS])
-{
+int candidatos_actualizar_c(CELDA cuadricula[NUM_FILAS][NUM_COLUMNAS]) {
+	int tiempo_init = temporizador_leer() / 1000;
   int celdas_vacias = 0;
   uint8_t i;
   uint8_t j;
@@ -83,5 +81,14 @@ int candidatos_actualizar_c(CELDA cuadricula[NUM_FILAS][NUM_COLUMNAS])
 	}
 
 	//retornar el numero de celdas vacias
+	tiempo_act +=  temporizador_leer()/1000 - tiempo_init;
 	return celdas_vacias;
+}
+
+int tiempo_actualizar(void) {
+	return tiempo_act;
+}
+
+void reset_tiempo_actualizar(void) {
+	tiempo_act = 0;
 }

@@ -13,6 +13,7 @@ void static borrar_tablero(CELDA cuadricula[NUM_FILAS][NUM_COLUMNAS]){
 		for (j=0; j < NUM_FILAS; j++) {
 			if (!esPista(cuadricula[i][j])) {
 				celda_poner_valor(&cuadricula[i][j], 0);
+				celda_borrarError(&cuadricula[i][j]);
 			}
 		}
 	}

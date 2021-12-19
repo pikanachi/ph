@@ -14,6 +14,11 @@ void temporizador_iniciar(void);
 void temporizador_empezar(void);
 
 /*
+ * Resetea el timer 1
+ */ 
+void reset_timer1(void);
+
+/*
  * Devuelve el tiempo que lleva contado timer1
  */
 int temporizador_leer(void);
