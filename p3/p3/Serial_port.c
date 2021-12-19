@@ -56,9 +56,13 @@ void actualizar_estado(char c){
 					estado = ESPERA_COL;
 					fila = c - '1';
 				}
-			} else{
+			} else {
 				estado = ESPERA_CMD;
-				enviar_string("\nInstruccion no reconocida\nIntroduce tu comando-->\0");
+				if (!empezado) {
+					enviar_string("\nPrimero debes empezar una partida con #NEW!\nIntroduce tu comando-->\0");
+				} else {
+					enviar_string("\nInstruccion no reconocida\nIntroduce tu comando-->\0");
+				}
 			}
 			break;
 		case ESPERA_S:
@@ -327,10 +331,10 @@ void serial_ISR (void) __irq {
 					//hacer lo que sea que diga la accion
 					if (strcmp(rec_buffer, "#RST!") == 0) {
 						// Terminar partida
-						Evento jugada;
+						Evento terminar;
 						empezado = 0;
-						jugada.ID_evento = Terminar;
-						cola_guardar_evento(jugada);
+						terminar.ID_evento = Terminar;
+						cola_guardar_evento(terminar);
 					} else if (strcmp(rec_buffer, "#NEW!") == 0) {
 						// Nueva partida
 						Evento jugada;

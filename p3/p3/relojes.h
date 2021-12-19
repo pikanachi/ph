@@ -7,6 +7,8 @@
 //RTC
 void RTC_init(void);
 
+void RTC_reset(void);
+
 uint32_t RTC_leer_minutos(void);
 
 uint32_t RTC_leer_segundos(void);

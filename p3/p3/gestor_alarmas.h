@@ -18,15 +18,22 @@ struct Alarma {
     int        timeToLeave;        //tiempo en el que se ha de sacar la alarma en ms
 };
 
-
-void set_Alarma(uint8_t id, int periodo, int periodica);
-
 /*
  * Se inicializan con el programa a inválidas todas las alarmas y los timers
  */
 void ga_inicializar(void);
 
-void ga_borrar_alarmas(void);
+/*
+ * Invalida todas las alarmas en el gestor y crea un evento de tem perio a 50 ms para
+ * chequear las alarmas
+ */
+void ga_reset(void);
+
+/*
+ * Crea un evento de alarma con id de evento 'id' su periodo a saltar
+ * y si es una alarma periodica o no y la encola en el planificador
+ */
+void set_Alarma(uint8_t id, int periodo, int periodica);
 
 /*
  * Una vez que llega un evento de Temp_perio se comprueban las alarmas del gestor.
@@ -47,5 +54,10 @@ void ga_comprobar_alarmas(void);
  * Guarda un evento en la cola de temporizador periódico
  */
 void ga_encolar_evento_temp(void);
+
+/*
+ * Vacia el gestor de alarmas
+ */
+void ga_borrar_alarmas(void);
 
 #endif

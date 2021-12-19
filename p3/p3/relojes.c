@@ -15,6 +15,10 @@ void RTC_init(void){
 	PCONP = PCONP | 0x100;
 }
 
+void RTC_reset(void) {
+	CCR = 2;	//Resetear la cuenta(Poner a 1 el bit 1 del CCR)	
+}
+
 uint32_t RTC_leer_minutos(void) {
 	uint32_t res;
 	res = MIN;

@@ -18,6 +18,13 @@ void ga_inicializar(void) {
     }
 }
 
+void ga_reset(void) {
+		int i;  
+		temporizador_peridico(50);              //Inicializa el timer0 a para que genere evento Temp_perio cada 50ms
+    for (i = 0; i < NUM_EVENTOS; i++) {
+        alarmasPendientes[i].esValida = 0;  //Se inicializan las alarmas como no validas
+    }	
+}
 
 /*
  * Una vez que llega un evento de Temp_perio se comprueban las alarmas del gestor.
@@ -61,19 +68,23 @@ Alarma crear_alarma(Evento e) {
     return al;
 }
 
+/*
+ * Crea un evento de alarma con id de evento 'id' su periodo a saltar
+ * y si es una alarma periodica o no y la encola en el planificador
+ */
 void set_Alarma(uint8_t id, int periodo, int periodica){
 		int retardo;
 		Evento eAlarma;
-		retardo = periodo & 0x007FFFFF;     						// Asegurarnos que el retardo es de 23bits
+		retardo = periodo & 0x007FFFFF;     												// Asegurarnos que el retardo es de 23bits
 		eAlarma.ID_evento = Set_Alarma;
-		eAlarma.auxData = id;  							// ID evento a generar
+		eAlarma.auxData = id;  																			// ID evento a generar
 		eAlarma.auxData = eAlarma.auxData << 1;
 		if(periodica == 1){
 			eAlarma.auxData = eAlarma.auxData | periodica;          	// Es periódica
 		}
 		else{
-			eAlarma.auxData = eAlarma.auxData & 0xFFFFFFFE;         // No es periódica
-		}
+			eAlarma.auxData = eAlarma.auxData & 0xFFFFFFFE;         	// No es periódica
+		}	
 		eAlarma.auxData = eAlarma.auxData << 23;
 		eAlarma.auxData = eAlarma.auxData | retardo;
 		eAlarma.timestamp = clock_gettime() / 1000;
@@ -136,6 +147,9 @@ void ga_encolar_evento_temp(void) {
     cola_guardar_evento(e);
 }
 
+/*
+ * Vacia el gestor de alarmas
+ */
 void ga_borrar_alarmas(void){
 	memset(&alarmasPendientes[0], 0, sizeof(alarmasPendientes));
 }
