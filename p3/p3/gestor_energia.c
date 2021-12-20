@@ -1,6 +1,5 @@
 #include "gestor_energia.h"
 
-
 /*
  * Inicia la alarma para poner al procesador a PWDOWN
  */

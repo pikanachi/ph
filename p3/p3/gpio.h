@@ -5,7 +5,7 @@
 #include <stdint.h> // Para los uint
 
 /*
- * Para usar el GPIO y se llama antes que al resto de funciones
+ * Inicializa el GPIO
  */
 void GPIO_iniciar(void);
 
@@ -23,12 +23,14 @@ uint32_t GPIO_leer(uint8_t bit_inicial, uint8_t num_bits);
 void GPIO_escribir(uint8_t bit_inicial, uint8_t num_bits, uint32_t valor);
 
 /*
- * los bits indicados se utilizarán como pines de entrada.
+ * los bits indicados se utilizarán como pines de entrada desde bit_inicial hasta
+ * bit_inicial + num_bits.
  */
 void GPIO_marcar_entrada(uint8_t bit_inicial, uint8_t num_bits);
 
 /*
- * los bits indicados se utilizarán como pines de salida.
+ * los bits indicados se utilizarán como pines de salida desde bit_inicial hasta
+ * bit_inicial + num_bits.
  */
 void GPIO_marcar_salida(uint8_t bit_inicial, uint8_t num_bits);
 

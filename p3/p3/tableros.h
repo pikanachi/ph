@@ -7,6 +7,9 @@
 /* Tamanos de la cuadricula */
 /* Se utilizan 16 columnas para facilitar la visualizacion */
 
+/*
+ * Borra el tablero para dejarlo solo con las pistas
+ */
 void static borrar_tablero(CELDA cuadricula[NUM_FILAS][NUM_COLUMNAS]){
 	int i, j;
 	for (i=0; i < NUM_FILAS; i++) {

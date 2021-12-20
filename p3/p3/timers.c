@@ -63,7 +63,7 @@ void temporizador_empezar(void) {
  */
 int temporizador_leer(void) {
     int tiempo = (timer1_int_count * (0xFFFFFFFF / ticks_by_msec)) * 1000;  //tiempo en us
-    int pico = (T1TC/ticks_by_msec) * (1000);                      //pico que se suma(lo que llevamos)
+    int pico = (T1TC/ticks_by_msec) * (1000);                      					//pico que se suma(lo que llevamos)
 
     return tiempo + pico;
 }
@@ -82,14 +82,14 @@ int temporizador_parar(void) {
  */
 void temporizador_peridico(int periodo) {
 	//periodo en ms se pasa a ticks
-    T0MR0 = (periodo * ticks_by_msec);          //Se pone el mach register a los ticks que ha de llegar según el período
-    T0MCR = 3;                                         // Generates an interrupt and resets the count when the value of MR0 is reached
+    T0MR0 = (periodo * ticks_by_msec);          				//Se pone el mach register a los ticks que ha de llegar según el período
+    T0MCR = 3;                                         	// Generates an interrupt and resets the count when the value of MR0 is reached
 		T0TCR = 1;
-		//VICVectAddr0 = (unsigned long)timer0_ISR;          // set the RSI
+		//VICVectAddr0 = (unsigned long)timer0_ISR;         // set the RSI
 		VICIntSelect = VICIntSelect | 16;
    
     // 0x20 bit 5 enables vectored IRQs. 
     // 4 is the number of the interrupt assigned. Number 4 is the Timer 0 (see table 40 of the LPC2105 user manual  
 		VICVectCntl0 = 0x20 | 4;   
-    VICIntEnable = VICIntEnable | 0x00000010;          // Enable Timer0 Interrupt
+    VICIntEnable = VICIntEnable | 0x00000010;          	// Enable Timer0 Interrupt
 }

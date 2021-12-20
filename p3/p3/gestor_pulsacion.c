@@ -1,6 +1,5 @@
 #include "gestor_pulsacion.h"
 
-
 static unsigned int estado_pulsacion_EINT1 = NO_PULSADO;
 static unsigned int estado_pulsacion_EINT2 = NO_PULSADO;
 
@@ -12,6 +11,9 @@ void gp_inicializar(void) {
     eint2_init();
 }
 
+/*
+ * Devuelve 1 si el estado es PULSADO. Devuelve 0 en caso contrario
+ */
 unsigned int gp_leer_pulsacion_1(void){
 	unsigned int retVal = 0;
 	if(estado_pulsacion_EINT1 == PULSADO){
@@ -20,28 +22,34 @@ unsigned int gp_leer_pulsacion_1(void){
 	return retVal;
 }
 
+/*
+ * Devuelve el estado de EINT1
+ */
 unsigned int leer_estado_1(void){
 	return estado_pulsacion_EINT1;
 }
 
+/*
+ * Devuelve el estado de EINT2
+ */
 unsigned int leer_estado_2(void){
 	return estado_pulsacion_EINT2;
 }
 
 unsigned int leer_entrada_1(void) {
-	EXTINT =  EXTINT | 2; // clear interrupt flag de EINT0, EINT1 y EINT2
+	EXTINT =  EXTINT | 2; 				// clear interrupt flag de EINT0, EINT1 y EINT2
 	if ((EXTINT & 0x2) == 2) {
-		return 1;	//El botón sigue pulsado
+		return 1;										//El botón sigue pulsado
 	}
-		return 0; //El botón no está pulsado
+		return 0; 									//El botón no está pulsado
 }
 
 unsigned int leer_entrada_2(void) {
-	EXTINT =  EXTINT | 1; // clear interrupt flag de EINT0, EINT1 y EINT2
+	EXTINT =  EXTINT | 1; 				// clear interrupt flag de EINT0, EINT1 y EINT2
 	if ((EXTINT & 0x4) == 4) {
-		return 1;	//El botón sigue pulsado
+		return 1;										//El botón sigue pulsado
 	}
-		return 0; //El botón no está pulsado
+		return 0; 									//El botón no está pulsado
 }
 
 /*

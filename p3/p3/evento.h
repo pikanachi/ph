@@ -34,17 +34,15 @@ enum {
     Pulsacion_EINT1 = 4,
     Pulsacion_EINT2 = 5,
     Power_Down = 6,
-    Check_Entrada = 7,
-    Apagar_Validacion = 8,
-    Terminar = 9,
-    Check_Pulsacion_Terminar = 10,
-		Latido = 11,
-		No_Confir_Jugada = 12,
-		Latido_Validacion = 13,
-		Candidatos = 14,
-		Jugada = 15,
-		Feed = 16,
-		Start = 17
+    Apagar_Validacion = 7,
+    Terminar = 8,
+		Latido = 9,
+		No_Confir_Jugada = 10,
+		Latido_Validacion = 11,
+		Candidatos = 12,
+		Jugada = 13,
+		Feed = 14,
+		Start = 15
 };
 
 /*

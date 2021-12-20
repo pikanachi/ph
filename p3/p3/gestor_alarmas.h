@@ -24,8 +24,8 @@ struct Alarma {
 void ga_inicializar(void);
 
 /*
- * Invalida todas las alarmas en el gestor y crea un evento de tem perio a 50 ms para
- * chequear las alarmas
+ * Vuelve a configurar un temporizador periodico a 50ms tras resetear una partida y elimina todas las alarmas
+ * poniendolas como invalidas
  */
 void ga_reset(void);
 

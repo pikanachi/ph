@@ -11,5 +11,4 @@ void __swi(0xFC) disable_isr_fiq (void);
 
 uint32_t __swi(0) clock_gettime(void);
 
-
 #endif

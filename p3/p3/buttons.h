@@ -6,19 +6,15 @@
 #include "gestor_alarmas.h"
 #include "idle_pwdwn.h"
 
-
-
 /*
  * Habilita las interrupciones EINT1 en el pin P0.14
  */
 void eint1_init (void);
 
-
 /*
  * Habilita las interrupciones EINT2 en el pin P0.15
  */
 void eint2_init (void);
-
 
 /*
  * Habilita interrupciones en VIC
@@ -33,7 +29,6 @@ void button_enable_interrupts_2(void);
 unsigned int button_nueva_pulsacion_1(void);
 
 unsigned int button_nueva_pulsacion_2(void);
-
 
 /*
  * Resetean a 0 las nuevas pulsaciones

@@ -97,20 +97,12 @@ void planificador_main(void) {
 							UART_acaba_jugada();
 							UART_enviar_string("Jugada confirmada\nIntroduce tu comando-->\0");
 							break;
-						case Pulsacion_EINT2 :
-							//Borrar dato seleccionado de la celda
-							gIO_eliminar_valor();
+						case Pulsacion_EINT2 ://<................................................¿QUITAMOS EINT2?
 							break;
 						case Power_Down:
-							//Poner al procesador en modo powerDown
 							ge_modo_pwdwn();
 							break;
-						case Check_Entrada:
-							//Poner al procesador en modo powerDown
-							gIO_check_entrada();
-							break;
 						case Apagar_Validacion:
-							//Poner al procesador en modo powerDown
 							gIO_apagar_validacion();
 							break;
 						case Terminar:
@@ -120,26 +112,6 @@ void planificador_main(void) {
 							ga_reset();
 							terminar = 1;	
 							break;
-						/*
-						case Check_Pulsacion_Terminar:
-							//Poner al procesador en modo powerDown
-							if(gp_leer_pulsacion_1() == 0){ 											// Se ha despulsado
-								retardo = 0;
-								eAlarma.ID_evento = Set_Alarma;
-								eAlarma.auxData = Check_Pulsacion_Terminar;  				// ID evento a generar
-								eAlarma.auxData = eAlarma.auxData << 1;
-								eAlarma.auxData = eAlarma.auxData | 1;         			// Es periódica
-								eAlarma.auxData = eAlarma.auxData << 23;
-								eAlarma.auxData = eAlarma.auxData | retardo;
-								eAlarma.timestamp = temporizador_leer() / 1000;
-								disable_isr_fiq();
-								cola_guardar_evento(eAlarma); 
-								enable_isr_fiq(); 
-								vaciar_cola();
-								ge_modo_pwdwn();
-							}
-							break;
-							*/
 						case Latido:
 							gIO_alternar_latido();
 							break;

@@ -4,7 +4,7 @@
 #include <string.h>
 
 
-static Cola c;  //static para que no la lie al compilar con otras globales (otra var con el mismo nombre en otro c)
+static Cola c;
 
 /*
  * Crea la cola circular vacía, es decir, sin Evento.
@@ -15,14 +15,12 @@ void cola_crear_vacia(void) {
 	c.indPrimEv = 0;
 }
 
-
 /*
  * Si numEventos < maxEventos devuelve la cola circular resultante de añadir a c
  * el Evento e. Si no, devuelve la cola resultante de añadir a c el Evento e, eliminando
  * el Evento más antiguo de la cola, activando el flag V (Overflow).
  */
 void cola_guardar_evento(Evento e) {
-	//disable_isr_fiq();
 	c.eventos[c.indProxEv] = e;
 
 	if (!cola_es_vacia() && c.indPrimEv == c.indProxEv) {   //Overflow
@@ -33,9 +31,7 @@ void cola_guardar_evento(Evento e) {
 		c.numEventos++;
 	}
 	c.indProxEv = (c.indProxEv + 1) % MAX_EVENTOS;
-	//enable_isr_fiq();
 }
-
 
 /* 
  * Si numEventos > 0, devuelve el Evento más antiguo de la cola (el primero) y devuelve la
@@ -55,7 +51,6 @@ Evento cola_desencola_mas_antiguo(void) {
 	return e;
 }
 
-
 /*
  * Devuelve 1 (verdad) sí y sólo si la cola c no tiene ningún Evento.
  * devuelve 0 (falso) en caso contrario.
@@ -63,7 +58,6 @@ Evento cola_desencola_mas_antiguo(void) {
 uint8_t cola_es_vacia(void) {
 	return c.numEventos == 0;
 }
-
 
 /*
  * Si numEventos > 0, devuelve el Evento más nuevo encolado en la cola (el último). En caso contrario, devuelve
@@ -80,7 +74,6 @@ Evento cola_ultimo(void) {
 	}
 	return e;
 }
-
 
 /*
  * Llama a crearVacia

@@ -10,20 +10,24 @@ Alarma alarmasPendientes[NUM_EVENTOS];
  */
 void ga_inicializar(void) {
 		int i;
+	  for (i = 0; i < NUM_EVENTOS; i++) {
+			alarmasPendientes[i].esValida = 0;  	//Se inicializan las alarmas como no validas
+    }
     temporizador_iniciar();                 //Inicializa el timer 1
 		temporizador_empezar();
     temporizador_peridico(50);              //Inicializa el timer0 a para que genere evento Temp_perio cada 50ms
-    for (i = 0; i < NUM_EVENTOS; i++) {
-        alarmasPendientes[i].esValida = 0;  //Se inicializan las alarmas como no validas
-    }
 }
 
+/*
+ * Vuelve a configurar un temporizador periodico a 50ms tras resetear una partida y elimina todas las alarmas
+ * poniendolas como invalidas
+ */
 void ga_reset(void) {
 		int i;  
-		temporizador_peridico(50);              //Inicializa el timer0 a para que genere evento Temp_perio cada 50ms
-    for (i = 0; i < NUM_EVENTOS; i++) {
-        alarmasPendientes[i].esValida = 0;  //Se inicializan las alarmas como no validas
+		for (i = 0; i < NUM_EVENTOS; i++) {
+			alarmasPendientes[i].esValida = 0;  	//Se inicializan las alarmas como no validas
     }	
+		temporizador_peridico(50);              //Inicializa el timer0 a para que genere evento Temp_perio cada 50ms
 }
 
 /*

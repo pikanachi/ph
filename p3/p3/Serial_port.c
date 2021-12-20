@@ -381,9 +381,9 @@ void serial_ISR (void) __irq {
 						// Jugada
 						Evento jugada;
 						jugada.ID_evento = Jugada;
-						jugada.auxData = rec_buffer[index_rec_buffer - 4] - '0'; //Fila
+						jugada.auxData = rec_buffer[index_rec_buffer - 4] - '0'; 			//Fila
 						jugada.auxData <<= 8;
-					  jugada.auxData |= rec_buffer[index_rec_buffer - 3] - '0'; //Columna
+					  jugada.auxData |= rec_buffer[index_rec_buffer - 3] - '0'; 		//Columna
 						cola_guardar_evento(jugada);					
 					
 					}	else if (rec_buffer[index_rec_buffer - 1] == 'C' && rec_buffer[index_rec_buffer - 2] >= '0' && 
@@ -392,21 +392,21 @@ void serial_ISR (void) __irq {
 						// Mostrar candidatos				 
 						Evento candidatos;
 						candidatos.ID_evento = Candidatos;
-						candidatos.auxData = rec_buffer[index_rec_buffer - 3] - '0'; //Fila
+						candidatos.auxData = rec_buffer[index_rec_buffer - 3] - '0'; 	//Fila
 						candidatos.auxData <<= 8;
 					  candidatos.auxData |= rec_buffer[index_rec_buffer - 2] - '0'; //Columna
 						cola_guardar_evento(candidatos);
 					}	
-					memset(&rec_buffer[0], 0, sizeof(rec_buffer)); 		//Clear buffer
-					index_rec_buffer = 0;															// Reiniciar el buffer para leer otro mensaje
+					memset(&rec_buffer[0], 0, sizeof(rec_buffer)); 									// Clear buffer
+					index_rec_buffer = 0;																						// Reiniciar el buffer para leer otro mensaje
 				} 
 			} else {
-				memset(&rec_buffer[0], 0, sizeof(rec_buffer)); 			//Clear buffer
-				index_rec_buffer = 0;																// Hemos llenado el buffer, resetear
+				memset(&rec_buffer[0], 0, sizeof(rec_buffer)); 										// Clear buffer
+				index_rec_buffer = 0;																							// Hemos llenado el buffer, resetear
 			}
 		} else{
 			char aux;
-			aux = U0RBR;																					// Receiver send_buffer RBR Register (nos da el caracter introducido en la UART)
+			aux = U0RBR;																												// Receiver send_buffer RBR Register (nos da el caracter introducido en la UART)
 			continuar_msj();
 		}
 	} 
@@ -423,17 +423,17 @@ void serial_ISR (void) __irq {
 /*
  * Inicializa las interrupciones de la UART0
  */
-void UART_init_serial(void)  {        				// Initialize Serial Interface	
-  PINSEL0 = PINSEL0 | 0x5;             				// Enable RxD1 and TxD1
-  U0LCR = 0x83;                          			// 8 bits, no Parity, 1 Stop bit
-  U0DLL = 97;                            			// Divisor Latch LSB 9600 Baud Rate @ 15MHz VPB Clock
-  U0LCR = 0x03;                          			// Line Control Register DLAB = 0
+void UART_init_serial(void)  {        							// Initialize Serial Interface	
+  PINSEL0 = PINSEL0 | 0x5;             							// Enable RxD1 and TxD1
+  U0LCR = 0x83;                          						// 8 bits, no Parity, 1 Stop bit
+  U0DLL = 97;                            						// Divisor Latch LSB 9600 Baud Rate @ 15MHz VPB Clock
+  U0LCR = 0x03;                          						// Line Control Register DLAB = 0
 	
 	//habilitar interrupciones de uart1
 	VICIntEnable = VICIntEnable | 0x00000040; 
 	VICVectAddr5 = (unsigned long)serial_ISR;
 	VICVectCntl5 = 0x20 | 6;
-	U0IER = U0IER | 0x3;												// Interrupt Enable Register, habilitar las RBR (Receiver send_buffer Register) y las THR (Transmit Holding Register)
+	U0IER = U0IER | 0x3;															// Interrupt Enable Register, habilitar las RBR (Receiver send_buffer Register) y las THR (Transmit Holding Register)
 	candidatos_actualizar_c(cuadricula_C_C);
 }
 
@@ -452,7 +452,7 @@ void UART_enviar_string(char *string) {
 		send_buffer[size_send_buffer] = string[size_send_buffer];
 		size_send_buffer++;
 	}
-	U0THR = send_buffer[index_send_buffer]; 							//manda el primer caracter a la UART0
+	U0THR = send_buffer[index_send_buffer]; 					//manda el primer caracter a la UART0
 	index_send_buffer++;
 }
 

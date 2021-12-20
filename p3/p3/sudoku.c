@@ -44,14 +44,10 @@ void candidatos_propagar_c(CELDA cuadricula[NUM_FILAS][NUM_COLUMNAS],
 }
 
 
-/* *****************************************************************************
+/*
  * calcula todas las listas de candidatos (9x9)
  * necesario tras borrar o cambiar un valor (listas corrompidas)
- * retorna el numero de celdas vacias */
-
-/* Init del sudoku en codigo C invocando a propagar en C
- * Recibe la cuadricula como primer parametro
- * y devuelve en celdas_vacias el n?mero de celdas vacias
+ * retorna el numero de celdas vacias 
  */
 int candidatos_actualizar_c(CELDA cuadricula[NUM_FILAS][NUM_COLUMNAS]) {
 	int tiempo_init = temporizador_leer() / 1000;
@@ -67,28 +63,31 @@ int candidatos_actualizar_c(CELDA cuadricula[NUM_FILAS][NUM_COLUMNAS]) {
 			}
 		}
 	}
-
 	//recalcular candidatos de las celdas vacias calculando cuantas hay vacias
 	for (i=0; i < NUM_FILAS; i++) {
 		for (j=0; j < NUM_FILAS; j++) {
 			if (esVacia(cuadricula[i][j])) {
 				celdas_vacias++;
 			} else {
-				//ORIGINAL candidatos_propagar_c(cuadricula, i, j);
-					candidatos_propagar_c(cuadricula, i, j);
+				candidatos_propagar_c(cuadricula, i, j);
 			}
 		}
 	}
-
 	//retornar el numero de celdas vacias
 	tiempo_act +=  temporizador_leer()/1000 - tiempo_init;
 	return celdas_vacias;
 }
 
+/*
+ * Devuelve tiempo contado que tarda la funcion candidatos actualizar
+ */
 int tiempo_actualizar(void) {
 	return tiempo_act;
 }
 
+/*
+ * Pone a 0 el tiempo contado que tarda la funcion candidatos actualizar
+ */
 void reset_tiempo_actualizar(void) {
 	tiempo_act = 0;
 }

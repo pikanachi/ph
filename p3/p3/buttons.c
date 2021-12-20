@@ -2,8 +2,6 @@
 
 #define TIME_AL_PUL 100
 
-
-
 static volatile int nueva_pulsacion_eint1;
 static volatile int nueva_pulsacion_eint2;
 
@@ -21,7 +19,7 @@ void eint1_ISR (void) __irq {
 	
 	//Encolar alarma EINT1 a 100 ms
   retardo = TIME_AL_PUL & 0x007FFFFF;     					// Asegurarnos que el retardo es de 23bits
-	set_Alarma(Check_Pulsacion_EINT1, retardo, 1);             				// Se encola el evento   
+	set_Alarma(Check_Pulsacion_EINT1, retardo, 1);    // Se encola el evento   
 	
 	//Actualizar contador para PWDOWN
 	retardo = TIME_PWDN & 0x007FFFFF;     						// Asegurarnos que el retardo es de 23bits
@@ -32,7 +30,6 @@ void eint1_ISR (void) __irq {
   cola_guardar_evento(ePulsacion); 
 	enable_isr_fiq();
 }
-
 
 /*
  * ISR para las EINT2
@@ -85,7 +82,6 @@ void button_clear_nueva_pulsacion_2(void){
 	nueva_pulsacion_eint2 = 0;
 }
 
-
 /*
  * Habilita interrupciones en VIC
  */
@@ -96,8 +92,6 @@ void button_enable_interrupts_1(void) {
 void button_enable_interrupts_2(void) {
   VICIntEnable = VICIntEnable | 0x00010000;
 }
-
-
 
 /*
  * Habilita las interrupciones EINT1 en el pin P0.14
@@ -114,7 +108,6 @@ void eint1_init (void) {
   PINSEL0 = PINSEL0 | 0x20000000;                 // To enable EINT1 interrupt 10, pin P0.14
 	VICVectCntl1 = 0x20 | 15;                       // 0x20 bit 5 enables vectored IRQs. Number 15 is the EINT1
 }
-
 
 /*
  * Habilita las interrupciones EINT2 en el pin P0.15

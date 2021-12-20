@@ -21,64 +21,79 @@ enum { BIT_CANDIDATOS = 7 };
 
 typedef uint16_t CELDA;
 
-/* *****************************************************************************
- * elimina el candidato del valor almacenado en la celda indicada */
-__inline static void celda_eliminar_candidato(CELDA *celdaptr, uint8_t valor)
-{
+/*
+ * Elimina el candidato del valor almacenado en la celda indicada 
+ */
+__inline static void celda_eliminar_candidato(CELDA *celdaptr, uint8_t valor) {
     *celdaptr = *celdaptr | (0x0001 << (BIT_CANDIDATOS + valor - 1));
 }
 
-/* *****************************************************************************
- * modifica el valor almacenado en la celda indicada */
-__inline static void
-celda_poner_valor(CELDA *celdaptr, uint8_t val)
-{
+/*
+ * Modifica el valor almacenado en la celda indicada 
+ */
+__inline static void celda_poner_valor(CELDA *celdaptr, uint8_t val) {
     *celdaptr = (*celdaptr & 0xFFF0) | (val & 0x000F);
 }
 
-/* *****************************************************************************
- * extrae el valor almacenado en los 16 bits de una celda */
-__inline static uint8_t
-celda_leer_valor(CELDA celda)
-{
+/*
+ * Extrae el valor almacenado en los 16 bits de una celda 
+ */
+__inline static uint8_t celda_leer_valor(CELDA celda) {
     return (celda & 0x000F);
 }
 
-__inline static uint16_t
-celda_leer_candidatos(CELDA celda)
-{
+/*
+ * Devuelve los candidatos de una celda 
+ */
+__inline static uint16_t celda_leer_candidatos(CELDA celda) {
     return (celda & 0xFF80) >> 7;
 }
 
-/* *****************************************************************************
- * devuelve 0 si y sólo sí celda_leer_valor(celda) = 0 */
-__inline static uint8_t esVacia(CELDA celda)
-{
+/*
+ * Devuelve 0 si y sólo sí celda_leer_valor(celda) = 0 
+ */
+__inline static uint8_t esVacia(CELDA celda) {
 	return celda_leer_valor(celda) == 0;
 }
 
-/* *****************************************************************************
- * modifica la celda poniendo a 0 todos sus candidatos (todos son candidatos) */
-static void elminaCandidatos(CELDA *celdaptr) {
+/*
+ * Modifica la celda poniendo a 0 todos sus candidatos (todos son candidatos) 
+ */
+__inline static void elminaCandidatos(CELDA *celdaptr) {
 	*celdaptr = *celdaptr & 0x007F;
 }
 
-static int esPista(CELDA celda){
+/*
+ * Devuelve 1 si la celda seleccionada es pista. 0 en caso contrario
+ */
+__inline static int esPista(CELDA celda) {
 	return celda & 0x0010;
 }
 
-static int esError(CELDA celda){
+/*
+ * Devuelve 1 si la celda seleccionada es error. 0 en caso contrario
+ */
+__inline static int esError(CELDA celda) {
 	return celda & 0x0020;
 }
 
+/*
+ * Pone a 0 el bit de error de la celda *celdaptr
+ */
 __inline void celda_borrarError(CELDA *celdaptr) {
 	*celdaptr = *celdaptr & 0xFFFFFFDF;
 }
 
+/*
+ * Pone a 1 el bit de error de la celda *celdaptr
+ */
 __inline void celda_ponerError(CELDA *celdaptr) {
 	*celdaptr = *celdaptr | 0x20;
 }
-	
+
+/*
+ * Devuelve 1 si no es candidato valor en la celda. 0 en caso contrario
+ */
 static int celda_noEsCandidato(CELDA celda, uint8_t valor){
 	int mask = 1 << (6 + valor);
 	mask = mask & celda;
@@ -103,4 +118,5 @@ static void checkError(CELDA *celda, uint8_t old_valor){
 	}
 	
 }
+
 #endif // CELDA_H
