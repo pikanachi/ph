@@ -4,6 +4,9 @@
 
 //RTC (EL RTC SIGUE FUNCIONANDO CUANDO SALTA EL WD)
 
+static int old_min = 0;
+static int old_sec = 0;
+
 /*
  * Inicializa el RTC
  */
@@ -18,12 +21,18 @@ void RTC_init(void){
 	PCONP = PCONP | 0x100;
 }
 
+void RTC_reset(void){
+	old_min = MIN;
+	old_sec = SEC;
+	CCR = 0;
+}
+
 /*
  * Devuelve los minutos que lleva contados el RTC
  */
 uint32_t RTC_leer_minutos(void) {
 	uint32_t res;
-	res = MIN;
+	res = MIN - old_min;
 	return res;
 }
 
@@ -32,7 +41,7 @@ uint32_t RTC_leer_minutos(void) {
  */
 uint32_t RTC_leer_segundos(void) {
 	uint32_t res;
-	res = SEC;
+	res = SEC- old_sec;
 	return res;
 }
 

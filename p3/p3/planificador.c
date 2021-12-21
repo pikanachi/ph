@@ -20,7 +20,6 @@ void planificador_main(void) {
 	
 	//Empezar la cola de eventos
 	cola_crear_vacia();
-	RTC_init();
 	WD_init(20);
 
 	//Inicializar gestores
@@ -32,31 +31,22 @@ void planificador_main(void) {
 	UART_init_serial(); 
 	while(1) {	
 		if (terminar) {
+			vaciar_cola();
+			ga_reset();
+			ge_modo_pwdwn();
+			UART_reset();
 			//Resetear el rtc
-			sprintf(time, "%d", RTC_leer_minutos());
-			sprintf(secs, "%d", RTC_leer_segundos());
-			strcpy(msg,"\n\n            PARTIDA FINALIZADA          \n----------------------------------------\n");
-			strcat(msg, "Tiempo de juego: ");
-			strcat(msg, time);
-			strcat(msg, " m ");
-			strcat(msg, secs);
-			strcat(msg, " s\n");
+
 			
-			sprintf(time, "%d", tiempo_actualizar());
-			strcat(msg, "Tiempo candidatos actualizar: ");
-			strcat(msg, time);
-			strcat(msg, " ms\n");
-			strcat(msg, empieza);	
-			UART_enviar_string(msg);
-			
-			RTC_init();
+			RTC_reset();
 			reset_timer1();
 			WD_init(20);				// Resetear el WD para volver a crear su alarma
 			reset_tiempo_actualizar();
 			gIO_reset();
 			ge_inicializar();
 			WD_feed();
-			
+			terminar = 0;
+			UART_enviar_string(empieza);
 		} else {
 			UART_enviar_string(empieza);
 		}
@@ -83,21 +73,15 @@ void planificador_main(void) {
 							//Se mira en el gestor de pulsaciones si sigue pulsada la tecla
 							gp_actualizar_estado_EINT1();
 							break;
-						case Check_Pulsacion_EINT2 :
-							//Se comprueba si sigue pulsada EINT2
-							gp_actualizar_estado_EINT2();
-							break;
 						case Pulsacion_EINT1 :
-							//Se comprueba si sigue pulsada EINT1
-							//gIO_escribir_entrada();
 							//CONFIRMAR ENTRADA (Cancelar la alarma de No_Confir_Entrada)
-							disable_isr_fiq();
-							set_Alarma(No_Confir_Jugada,0,0);
-							enable_isr_fiq();
-							UART_acaba_jugada();
-							UART_enviar_string("Jugada confirmada\nIntroduce tu comando-->\0");
-							break;
-						case Pulsacion_EINT2 ://<................................................¿QUITAMOS EINT2?
+							if(en_jugada()){
+								disable_isr_fiq();
+								set_Alarma(No_Confir_Jugada,0,0);
+								enable_isr_fiq();
+								UART_acaba_jugada();
+								UART_enviar_string("Jugada confirmada\nIntroduce tu comando-->\0");
+							}
 							break;
 						case Power_Down:
 							ge_modo_pwdwn();
@@ -107,10 +91,27 @@ void planificador_main(void) {
 							break;
 						case Terminar:
 							//Se reinicia el tablero
+							if(evento.auxData != 1){
+								strcpy(msg,"\n\n            PARTIDA FINALIZADA          \n----------------------------------------\n");
+							} else{
+								strcpy(msg,"\n\n                HAS GANADO              \n----------------------------------------\n");
+							}
 							UART_borrar_tablero();
-							vaciar_cola();
-							ga_reset();
-							terminar = 1;	
+							set_Alarma(Check_Terminado_PWDOWN, 150, 1);
+							sprintf(time, "%d", RTC_leer_minutos());
+							sprintf(secs, "%d", RTC_leer_segundos());
+							
+							strcat(msg, "Tiempo de juego: ");
+							strcat(msg, time);
+							strcat(msg, " m ");
+							strcat(msg, secs);
+							strcat(msg, " s\n");
+							
+							sprintf(time, "%d", tiempo_actualizar());
+							strcat(msg, "Tiempo candidatos actualizar: ");
+							strcat(msg, time);
+							strcat(msg, " ms\n");
+							UART_enviar_string(msg);
 							break;
 						case Latido:
 							gIO_alternar_latido();
@@ -135,7 +136,15 @@ void planificador_main(void) {
 							WD_feed();
 							break;
 						case Start:
+							RTC_init();
 							UART_actualizar("Introduce tu comando-->\0");
+							break;
+						case Check_Terminado_PWDOWN:
+							if(UART_ha_terminado() && (gp_leer_pulsacion_1() == 0)){
+								terminar = 1;
+							}
+							break;
+						
 					}
 				}
 			} else { // Cola vacia

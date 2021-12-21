@@ -317,6 +317,15 @@ void UART_acaba_jugada(void){
 	disable_isr_fiq();
 	set_Alarma(Latido_Validacion,0,0);
 	enable_isr_fiq();
+	if(check_resuelto(cuadricula_C_C)){
+		Evento ganar;
+		ganar.ID_evento = Terminar;
+		ganar.auxData = 1;
+		disable_isr_fiq();
+		cola_guardar_evento(ganar);
+		enable_isr_fiq();
+		jugada = 1;
+	}
 }
 
 /*
@@ -404,9 +413,8 @@ void serial_ISR (void) __irq {
 				memset(&rec_buffer[0], 0, sizeof(rec_buffer)); 										// Clear buffer
 				index_rec_buffer = 0;																							// Hemos llenado el buffer, resetear
 			}
-		} else{
-			char aux;
-			aux = U0RBR;																												// Receiver send_buffer RBR Register (nos da el caracter introducido en la UART)
+		} else{																											
+			U0FCR = U0FCR | 0x2;																								//Ignorar el byte escrito para que no vuelva a interrumpir
 			continuar_msj();
 		}
 	} 
@@ -434,7 +442,7 @@ void UART_init_serial(void)  {        							// Initialize Serial Interface
 	VICVectAddr5 = (unsigned long)serial_ISR;
 	VICVectCntl5 = 0x20 | 6;
 	U0IER = U0IER | 0x3;															// Interrupt Enable Register, habilitar las RBR (Receiver send_buffer Register) y las THR (Transmit Holding Register)
-	candidatos_actualizar_c(cuadricula_C_C);
+	candidatos_actualizar_c(cuadricula_C_C);					// Inicializar la cuadricula
 }
 
 /*
@@ -462,4 +470,12 @@ void UART_enviar_string(char *string) {
 void UART_borrar_tablero(void){
 	borrar_tablero(cuadricula_C_C);
 	candidatos_actualizar_c(cuadricula_C_C);
+}
+
+void UART_reset(void){
+	jugada = 0;
+}
+
+int en_jugada(void){
+	return jugada;
 }

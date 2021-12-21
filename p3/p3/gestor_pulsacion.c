@@ -1,14 +1,14 @@
 #include "gestor_pulsacion.h"
 
 static unsigned int estado_pulsacion_EINT1 = NO_PULSADO;
-static unsigned int estado_pulsacion_EINT2 = NO_PULSADO;
+//static unsigned int estado_pulsacion_EINT2 = NO_PULSADO;
 
 /*
  * Inicializa las interrupciones en EINT1 y EINT2
  */
 void gp_inicializar(void) {
     eint1_init();
-    eint2_init();
+    //eint2_init();
 }
 
 /*
@@ -32,9 +32,11 @@ unsigned int leer_estado_1(void){
 /*
  * Devuelve el estado de EINT2
  */
+/*
 unsigned int leer_estado_2(void){
 	return estado_pulsacion_EINT2;
 }
+*/
 
 unsigned int leer_entrada_1(void) {
 	EXTINT =  EXTINT | 2; 				// clear interrupt flag de EINT0, EINT1 y EINT2
@@ -43,7 +45,7 @@ unsigned int leer_entrada_1(void) {
 	}
 		return 0; 									//El botón no está pulsado
 }
-
+/*
 unsigned int leer_entrada_2(void) {
 	EXTINT =  EXTINT | 1; 				// clear interrupt flag de EINT0, EINT1 y EINT2
 	if ((EXTINT & 0x4) == 4) {
@@ -51,6 +53,7 @@ unsigned int leer_entrada_2(void) {
 	}
 		return 0; 									//El botón no está pulsado
 }
+*/
 
 /*
  * Comprueba si se ha levantado la pulsacion y actualiza el estado.
@@ -87,7 +90,7 @@ void gp_actualizar_estado_EINT1(void) {
 			break;
 		}
 }
-
+/*
 void gp_actualizar_estado_EINT2(void) {
 	unsigned int estado, entrada;
 	int retardo;
@@ -118,3 +121,4 @@ void gp_actualizar_estado_EINT2(void) {
 			break;
 		}
 }
+*/

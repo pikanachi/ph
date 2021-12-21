@@ -30,19 +30,18 @@ enum {
     Temp_perio = 0,
     Set_Alarma = 1,
     Check_Pulsacion_EINT1 = 2,
-    Check_Pulsacion_EINT2 = 3,
-    Pulsacion_EINT1 = 4,
-    Pulsacion_EINT2 = 5,
-    Power_Down = 6,
-    Apagar_Validacion = 7,
-    Terminar = 8,
-		Latido = 9,
-		No_Confir_Jugada = 10,
-		Latido_Validacion = 11,
-		Candidatos = 12,
-		Jugada = 13,
-		Feed = 14,
-		Start = 15
+    Pulsacion_EINT1 = 3,
+    Power_Down = 4,
+    Apagar_Validacion = 5,
+    Terminar = 6,
+		Latido = 7,
+		No_Confir_Jugada = 8,
+		Latido_Validacion = 9,
+		Candidatos = 10,
+		Jugada = 11,
+		Feed = 12,
+		Start = 13,
+		Check_Terminado_PWDOWN = 14
 };
 
 /*

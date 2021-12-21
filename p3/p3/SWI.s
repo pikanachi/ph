@@ -9,15 +9,9 @@
 ;/*****************************************************************************/
 
 T_Bit           EQU     0x20
-ENMASK			EQU		0x18060
-FIQMASK			EQU		0x18070
-VICIntEnable	EQU		0xFFFFF010
-VICIntEnClr		EQU		0xFFFFF014
 	
                 PRESERVE8                     ; 8-Byte aligned Stack
 					
-				AREA	data, DATA,READWRITE
-LASTVIC			DCD		0x0
 	
                 AREA    SWI_Area, CODE, READONLY
                 ARM

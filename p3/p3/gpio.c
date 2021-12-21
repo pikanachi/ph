@@ -4,8 +4,8 @@
  * Inicializa el GPIO
  */
 void GPIO_iniciar(){ 
-	GPIO_marcar_entrada(14,2);
-	GPIO_marcar_salida(16,17);
+	GPIO_marcar_entrada(14,1);
+	GPIO_marcar_salida(15,18);
 	GPIO_marcar_salida(0,14);
 }
 

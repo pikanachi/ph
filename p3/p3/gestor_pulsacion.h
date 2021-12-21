@@ -23,6 +23,6 @@ void gp_inicializar(void);
  */
 void gp_actualizar_estado_EINT1(void);
 
-void gp_actualizar_estado_EINT2(void);
+//void gp_actualizar_estado_EINT2(void);
 
 #endif

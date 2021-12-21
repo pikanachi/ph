@@ -451,11 +451,6 @@
               <FileType>1</FileType>
               <FilePath>.\softI.c</FilePath>
             </File>
-            <File>
-              <FileName>FIQ.s</FileName>
-              <FileType>2</FileType>
-              <FilePath>.\FIQ.s</FilePath>
-            </File>
           </Files>
         </Group>
         <Group>

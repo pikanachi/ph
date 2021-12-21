@@ -85,8 +85,7 @@ void temporizador_peridico(int periodo) {
     T0MR0 = (periodo * ticks_by_msec);          				//Se pone el mach register a los ticks que ha de llegar según el período
     T0MCR = 3;                                         	// Generates an interrupt and resets the count when the value of MR0 is reached
 		T0TCR = 1;
-		//VICVectAddr0 = (unsigned long)timer0_ISR;         // set the RSI
-		VICIntSelect = VICIntSelect | 16;
+		VICIntSelect = VICIntSelect | 16;										//Configurar timer0 como FIQ
    
     // 0x20 bit 5 enables vectored IRQs. 
     // 4 is the number of the interrupt assigned. Number 4 is the Timer 0 (see table 40 of the LPC2105 user manual  

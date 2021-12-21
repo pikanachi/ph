@@ -27,7 +27,7 @@ void UART_actualizar(char *msgFinal);
 /*
  * Devuelve 1 si se ha terminado de enviar el string a la UART. 0 en caso contrario
  */
-uint8_t ha_terminado(void);
+uint8_t UART_ha_terminado(void);
 
 /*
  * Escribe por la UART los candidatos de la celda correspondiente a la fila fil y de la columna col.
@@ -71,5 +71,15 @@ void UART_enviar_string(char *string);
  * Borra el tablero y recalcula los candidatos
  */
 void UART_borrar_tablero(void);
+
+/*
+ * Devuelve 0 si estamos en medio de una jugada, 1 en caso contrario
+ */
+int en_jugada(void);
+
+/*
+ * Prepara la UART para un reinicio de partida
+ */
+void UART_reset(void);
 
 #endif

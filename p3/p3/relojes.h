@@ -11,6 +11,8 @@
  */
 void RTC_init(void);
 
+void RTC_reset(void);
+
 /*
  * Devuelve los minutos que lleva contados el RTC
  */
